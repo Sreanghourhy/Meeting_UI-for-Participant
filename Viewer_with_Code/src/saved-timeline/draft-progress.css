@@ -1,0 +1,100 @@
+.draft-progress {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(142px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px 0 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow-x: auto;
+}
+
+.draft-progress-track {
+  position: absolute;
+  left: 42px;
+  right: calc(10% + 24px);
+  top: 39px;
+  height: 5px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, #22c55e 0 36%, #f59e0b 36% 50%, transparent 50%),
+    repeating-linear-gradient(90deg, #d1d5db 0 12px, transparent 12px 20px);
+}
+
+.draft-step {
+  position: relative;
+  z-index: 1;
+  min-width: 142px;
+  min-height: 118px;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #111827;
+  text-align: left;
+  box-shadow: none;
+}
+
+.draft-step-number {
+  width: 46px;
+  height: 46px;
+  border: 3px solid white;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #d1d5db;
+  color: white;
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: 0 0 0 1px #e5e7eb;
+}
+
+.draft-step.status-completed .draft-step-number {
+  background: #22c55e;
+}
+
+.draft-step.status-pending .draft-step-number,
+.draft-step.active .draft-step-number {
+  background: #f59e0b;
+}
+
+.draft-step.status-final .draft-step-number {
+  background: #cbd5e1;
+}
+
+.draft-step-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.draft-step-status {
+  width: fit-content;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.draft-step-title {
+  color: #111827;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.draft-step-desc {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
