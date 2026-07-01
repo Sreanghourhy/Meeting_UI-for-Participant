@@ -110,6 +110,30 @@ const draftProgressSteps = [
   },
 ]
 
+const draftStatusHistory = [
+  { status: 'សម្របសម្រួល', versions: 2, dates: ['2026-06-24', '2026-06-25'] },
+  { status: 'បច្ចេកទេស', versions: 3, dates: ['2026-06-26', '2026-06-27', '2026-06-28'] },
+  { status: 'អន្តរក្រសួង', versions: 1, dates: ['2026-06-29'] },
+  { status: 'ពេញអង្គគណៈរដ្ឋមន្ត្រី', versions: 1, dates: ['2026-06-30'] },
+  { status: 'អនុម័ត', versions: 1, dates: ['2026-07-01'] },
+]
+
+const khmerMonthNames = [
+  'មករា',
+  'កុម្ភៈ',
+  'មីនា',
+  'មេសា',
+  'ឧសភា',
+  'មិថុនា',
+  'កក្កដា',
+  'សីហា',
+  'កញ្ញា',
+  'តុលា',
+  'វិច្ឆិកា',
+  'ធ្នូ',
+]
+const khmerWeekdayShortNames = ['អា', 'ច', 'អ', 'ពុ', 'ព្រ', 'សុ', 'ស']
+
 function useHashRoute() {
   const [hash, setHash] = useState(window.location.hash || '#/')
 
@@ -239,6 +263,10 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
     window.requestAnimationFrame(() => window.dispatchEvent(new Event('resize')))
     window.setTimeout(() => window.dispatchEvent(new Event('resize')), 260)
   }
+  const collapseDocumentsSidebar = () => {
+    setIsDocumentsCollapsed(true)
+    refreshDocumentLayout()
+  }
 
   useEffect(() => {
     setDocumentPanel(null)
@@ -271,7 +299,12 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
           type="button"
           role="tab"
           aria-selected={activePanel === 'document' && isDraftDocument}
-          onClick={() => draftDocument && onSelectDocument(draftDocument)}
+          onClick={() => {
+            if (!draftDocument) return
+
+            onSelectDocument(draftDocument)
+            collapseDocumentsSidebar()
+          }}
         >
           សេចក្តីព្រាង
         </button>
@@ -281,7 +314,10 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
           <button
             className={`agenda-document-title ${showDraftProgress ? 'active' : ''}`}
             type="button"
-            onClick={() => setShowDraftProgress((isVisible) => !isVisible)}
+            onClick={() => {
+              setShowDraftProgress((isVisible) => !isVisible)
+              collapseDocumentsSidebar()
+            }}
           >
             <span className="file-glyph" aria-hidden="true" />
             {showDraftProgress ? 'សេចក្តីព្រាង' : 'កំណត់ត្រាសេចក្តីព្រាង'}
@@ -334,6 +370,7 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
             activePanel={isDraftDocument ? documentPanel : null}
             showDraftProgress={isDraftDocument && showDraftProgress}
             onBack={onBackToAgenda}
+            onCollapseDocumentsSidebar={collapseDocumentsSidebar}
           />
         ) : null}
         {activePanel === 'participants' ? <InlineParticipantsPreview meeting={meeting} headerTabs={panelTabs} /> : null}
@@ -431,33 +468,221 @@ function getDraftStepDocuments(meeting, currentDocument, stepId) {
   }, [])
 }
 
-function DraftStepDocuments({ meeting, currentDocument, selectedStep, onSelectDocument }) {
-  const documents = getDraftStepDocuments(meeting, currentDocument, selectedStep).slice(0, 5)
+function getDraftHistoryDocuments(currentDocument) {
+  let draftVersion = 0
+
+  return draftStatusHistory.flatMap((stage, stageIndex) => (
+    Array.from({ length: stage.versions }, (_, versionIndex) => {
+      draftVersion += 1
+
+      return {
+        ...currentDocument,
+        id: `${currentDocument.id}-draft-${stageIndex + 1}-${versionIndex + 1}`,
+        name: currentDocument.name,
+        uploadedAt: stage.dates[versionIndex],
+        draftStatus: stage.status,
+        draftVersion,
+      }
+    })
+  ))
+}
+
+function getDraftStatusClass(status) {
+  const statusIndex = draftStatusHistory.findIndex((stage) => stage.status === status)
+  return statusIndex >= 0 ? `status-${statusIndex + 1}` : 'status-default'
+}
+
+function toISODate(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function DraftDatePicker({ value, onChange }) {
+  const selectedDate = value ? new Date(`${value}T00:00:00`) : null
+  const initialDate = selectedDate || new Date(`${draftStatusHistory[0].dates[0]}T00:00:00`)
+  const [isOpen, setIsOpen] = useState(false)
+  const [visibleMonth, setVisibleMonth] = useState(new Date(initialDate.getFullYear(), initialDate.getMonth(), 1))
+  const monthStart = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1)
+  const gridStart = new Date(monthStart)
+  gridStart.setDate(monthStart.getDate() - monthStart.getDay())
+  const calendarDays = Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(gridStart)
+    date.setDate(gridStart.getDate() + index)
+    return date
+  })
+
+  const moveMonth = (offset) => {
+    setVisibleMonth((month) => new Date(month.getFullYear(), month.getMonth() + offset, 1))
+  }
+
+  return (
+    <div className="draft-date-picker">
+      <button
+        className={`draft-date-trigger ${value ? 'has-value' : ''}`}
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        aria-expanded={isOpen}
+      >
+        <span className="draft-date-icon" aria-hidden="true" />
+        <span>{value ? formatDraftDocumentDate({ uploadedAt: value }) : 'ជ្រើសកាលបរិច្ឆេទ'}</span>
+      </button>
+      {isOpen ? (
+        <div className="draft-date-popover">
+          <div className="draft-calendar-header">
+            <button type="button" onClick={() => moveMonth(-1)} aria-label="ខែមុន">‹</button>
+            <strong>{khmerMonthNames[visibleMonth.getMonth()]} {toKhmerNumeral(visibleMonth.getFullYear())}</strong>
+            <button type="button" onClick={() => moveMonth(1)} aria-label="ខែក្រោយ">›</button>
+          </div>
+          <div className="draft-calendar-weekdays">
+            {khmerWeekdayShortNames.map((day) => <span key={day}>{day}</span>)}
+          </div>
+          <div className="draft-calendar-grid">
+            {calendarDays.map((date) => {
+              const isoDate = toISODate(date)
+              const isCurrentMonth = date.getMonth() === visibleMonth.getMonth()
+              const isSelected = value === isoDate
+
+              return (
+                <button
+                  key={isoDate}
+                  className={`${isCurrentMonth ? '' : 'muted'} ${isSelected ? 'selected' : ''}`}
+                  type="button"
+                  onClick={() => {
+                    onChange(isoDate)
+                    setIsOpen(false)
+                  }}
+                >
+                  {toKhmerNumeral(date.getDate())}
+                </button>
+              )
+            })}
+          </div>
+          <button
+            className="draft-date-clear"
+            type="button"
+            onClick={() => {
+              onChange('')
+              setIsOpen(false)
+            }}
+          >
+            លុបតម្រងកាលបរិច្ឆេទ
+          </button>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
+function DraftStepDocuments({ currentDocument, onSelectDocument, onCollapseDocumentsSidebar }) {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [dateFilter, setDateFilter] = useState('')
+  const documents = getDraftHistoryDocuments(currentDocument)
+  const activeFilterCount = [searchQuery.trim(), statusFilter, dateFilter].filter(Boolean).length
+  const statusCounts = draftStatusHistory.reduce((counts, stage) => ({
+    ...counts,
+    [stage.status]: documents.filter((document) => document.draftStatus === stage.status).length,
+  }), {})
+  const filteredDocuments = documents.filter((document) => {
+    const versionLabel = `លើកទី${toKhmerNumeral(document.draftVersion)}`
+    const searchableText = [
+      document.name,
+      document.draftStatus,
+      versionLabel,
+      formatDraftDocumentDate(document),
+    ].join(' ').toLowerCase()
+    const matchesSearch = !searchQuery.trim() || searchableText.includes(searchQuery.trim().toLowerCase())
+    const matchesStatus = !statusFilter || document.draftStatus === statusFilter
+    const matchesDate = !dateFilter || document.uploadedAt === dateFilter
+
+    return matchesSearch && matchesStatus && matchesDate
+  })
 
   return (
     <div className="draft-document-workspace">
       <aside className="draft-document-list-panel">
+        <div className="draft-document-filters">
+          <label className="draft-search-control">
+            <span className="draft-search-icon" aria-hidden="true" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="ស្វែងរក"
+              aria-label="ស្វែងរកឯកសារសេចក្តីព្រាង"
+            />
+          </label>
+          <DraftDatePicker value={dateFilter} onChange={setDateFilter} />
+          {activeFilterCount ? (
+            <button
+              className="draft-filter-reset"
+              type="button"
+              onClick={() => {
+                setSearchQuery('')
+                setStatusFilter('')
+                setDateFilter('')
+              }}
+            >
+              សម្អាត {toKhmerNumeral(activeFilterCount)}
+            </button>
+          ) : null}
+        </div>
+        <div className="draft-status-filter" aria-label="តម្រងតាមស្ថានភាព">
+          <button
+            className={`draft-status-chip all ${statusFilter ? '' : 'active'}`}
+            type="button"
+            onClick={() => setStatusFilter('')}
+          >
+            <span>ទាំងអស់</span>
+            <strong>{toKhmerNumeral(documents.length)}</strong>
+          </button>
+          {draftStatusHistory.map((stage) => (
+            <button
+              key={stage.status}
+              className={`draft-status-chip ${getDraftStatusClass(stage.status)} ${statusFilter === stage.status ? 'active' : ''}`}
+              type="button"
+              onClick={() => setStatusFilter((currentStatus) => (currentStatus === stage.status ? '' : stage.status))}
+            >
+              <span>{stage.status}</span>
+              <strong>{toKhmerNumeral(statusCounts[stage.status] || 0)}</strong>
+            </button>
+          ))}
+        </div>
+        <div className="draft-document-list-heading">
+          <span>ឯកសារ</span>
+          <span>កាលបរិច្ឆេទ</span>
+          <span>ស្ថានភាព</span>
+          <span>កំណែ</span>
+        </div>
         <div className="document-list draft-document-list">
-          {documents.map((document) => (
+          {filteredDocuments.map((document) => (
             <button
               key={document.id}
               className="document-row draft-document-row"
               type="button"
-              onClick={() => onSelectDocument(document)}
+              onClick={() => {
+                onSelectDocument(document)
+                onCollapseDocumentsSidebar?.()
+              }}
             >
               <span className="document-row-copy">
                 <span className="document-name">{document.name}</span>
-                <span className="document-date-time">{formatDocumentDateTime(document)}</span>
               </span>
+              <span className="document-date-time">{formatDraftDocumentDate(document)}</span>
+              <span className={`draft-document-status ${getDraftStatusClass(document.draftStatus)}`}>{document.draftStatus}</span>
+              <span className="draft-document-version">លើកទី{toKhmerNumeral(document.draftVersion)}</span>
             </button>
           ))}
         </div>
+        {!filteredDocuments.length ? <div className="empty-state compact">រកមិនឃើញឯកសារតាមការស្វែងរក ឬតម្រងនេះទេ។</div> : null}
       </aside>
     </div>
   )
 }
 
-function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, showDraftProgress = false, onBack }) {
+function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, showDraftProgress = false, onBack, onCollapseDocumentsSidebar }) {
   const [selectedDraftStep, setSelectedDraftStep] = useState(1)
   const [draftPreviewDocument, setDraftPreviewDocument] = useState(null)
 
@@ -485,12 +710,8 @@ function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, sho
           draftPreviewDocument ? (
             <div className="draft-drilldown">
               <div className="draft-document-preview-heading">
-                <div>
-                  <span>ឯកសារដែលបានជ្រើស</span>
-                  <strong>{draftPreviewDocument.name}</strong>
-                </div>
                 <button className="btn btn-sm btn-secondary back-to-document-list-button" type="button" onClick={() => setDraftPreviewDocument(null)}>
-                  ត្រឡប់ទៅបញ្ជីឯកសារ
+                  ត្រឡប់ទៅឯកសារ
                 </button>
               </div>
               <DocumentPreview
@@ -502,10 +723,9 @@ function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, sho
             </div>
           ) : (
             <DraftStepDocuments
-              meeting={meeting}
               currentDocument={document}
-              selectedStep={1}
               onSelectDocument={setDraftPreviewDocument}
+              onCollapseDocumentsSidebar={onCollapseDocumentsSidebar}
             />
           )
         ) : (
@@ -650,7 +870,7 @@ function DocumentPreview({ meeting, document, activePanel: externalActivePanel, 
               <iframe
                 key={document.url}
                 className="document-pdf-frame"
-                src={`${document.url}#toolbar=0&navpanes=0`}
+                src={`${document.url}#toolbar=0&navpanes=0&view=FitH&zoom=page-width`}
                 title={displayCategory(document.category)}
               />
             </div>
@@ -877,6 +1097,10 @@ function formatDocumentSize(size) {
 function formatDocumentDateTime(document) {
   const dateText = document.uploadedAt ? formatDate(document.uploadedAt) : 'មិនមានកាលបរិច្ឆេទ'
   return `${dateText} · ${document.uploadedTime || '09:00'}`
+}
+
+function formatDraftDocumentDate(document) {
+  return document.uploadedAt ? formatDate(document.uploadedAt) : 'មិនមានកាលបរិច្ឆេទ'
 }
 
 function getDocumentCategory(document) {
