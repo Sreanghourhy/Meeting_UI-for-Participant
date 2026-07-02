@@ -295,33 +295,38 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
           ប្លង់កៅអី
         </button>
         <button
-          className={`tab agenda-title-tab ${activePanel === 'document' && isDraftDocument ? 'active' : ''}`}
+          className={`tab agenda-title-tab ${activePanel === 'document' && isDraftDocument && !showDraftProgress ? 'active' : ''}`}
           type="button"
           role="tab"
-          aria-selected={activePanel === 'document' && isDraftDocument}
+          aria-selected={activePanel === 'document' && isDraftDocument && !showDraftProgress}
           onClick={() => {
             if (!draftDocument) return
 
+            setShowDraftProgress(false)
             onSelectDocument(draftDocument)
             collapseDocumentsSidebar()
           }}
         >
           សេចក្តីព្រាង
         </button>
+        <button
+          className={`tab agenda-title-tab draft-note-tab ${activePanel === 'document' && isDraftDocument && showDraftProgress ? 'active' : ''}`}
+          type="button"
+          role="tab"
+          aria-selected={activePanel === 'document' && isDraftDocument && showDraftProgress}
+          onClick={() => {
+            if (!draftDocument) return
+
+            setShowDraftProgress(true)
+            onSelectDocument(draftDocument)
+            collapseDocumentsSidebar()
+          }}
+        >
+          កំណត់ត្រាសេចក្តីព្រាង
+        </button>
       </div>
-      {activePanel === 'document' && selectedDocument && isDraftDocument ? (
+      {activePanel === 'document' && selectedDocument && isDraftDocument && !showDraftProgress ? (
         <div className="agenda-document-actions">
-          <button
-            className={`agenda-document-title ${showDraftProgress ? 'active' : ''}`}
-            type="button"
-            onClick={() => {
-              setShowDraftProgress((isVisible) => !isVisible)
-              collapseDocumentsSidebar()
-            }}
-          >
-            <span className="file-glyph" aria-hidden="true" />
-            {showDraftProgress ? 'សេចក្តីព្រាង' : 'កំណត់ត្រាសេចក្តីព្រាង'}
-          </button>
           <button
             className={`pdf-action-button ${documentPanel === 'comments' ? 'active' : ''}`}
             type="button"
@@ -576,59 +581,21 @@ function DraftDatePicker({ value, onChange }) {
 }
 
 function DraftStepDocuments({ currentDocument, onSelectDocument, onCollapseDocumentsSidebar }) {
-  const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [dateFilter, setDateFilter] = useState('')
   const documents = getDraftHistoryDocuments(currentDocument)
-  const activeFilterCount = [searchQuery.trim(), statusFilter, dateFilter].filter(Boolean).length
   const statusCounts = draftStatusHistory.reduce((counts, stage) => ({
     ...counts,
     [stage.status]: documents.filter((document) => document.draftStatus === stage.status).length,
   }), {})
   const filteredDocuments = documents.filter((document) => {
-    const versionLabel = `លើកទី${toKhmerNumeral(document.draftVersion)}`
-    const searchableText = [
-      document.name,
-      document.draftStatus,
-      versionLabel,
-      formatDraftDocumentDate(document),
-    ].join(' ').toLowerCase()
-    const matchesSearch = !searchQuery.trim() || searchableText.includes(searchQuery.trim().toLowerCase())
     const matchesStatus = !statusFilter || document.draftStatus === statusFilter
-    const matchesDate = !dateFilter || document.uploadedAt === dateFilter
 
-    return matchesSearch && matchesStatus && matchesDate
+    return matchesStatus
   })
 
   return (
     <div className="draft-document-workspace">
       <aside className="draft-document-list-panel">
-        <div className="draft-document-filters">
-          <label className="draft-search-control">
-            <span className="draft-search-icon" aria-hidden="true" />
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="ស្វែងរក"
-              aria-label="ស្វែងរកឯកសារសេចក្តីព្រាង"
-            />
-          </label>
-          <DraftDatePicker value={dateFilter} onChange={setDateFilter} />
-          {activeFilterCount ? (
-            <button
-              className="draft-filter-reset"
-              type="button"
-              onClick={() => {
-                setSearchQuery('')
-                setStatusFilter('')
-                setDateFilter('')
-              }}
-            >
-              សម្អាត {toKhmerNumeral(activeFilterCount)}
-            </button>
-          ) : null}
-        </div>
         <div className="draft-status-filter" aria-label="តម្រងតាមស្ថានភាព">
           <button
             className={`draft-status-chip all ${statusFilter ? '' : 'active'}`}
@@ -709,16 +676,15 @@ function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, sho
         {showDraftProgress ? (
           draftPreviewDocument ? (
             <div className="draft-drilldown">
-              <div className="draft-document-preview-heading">
-                <button className="btn btn-sm btn-secondary back-to-document-list-button" type="button" onClick={() => setDraftPreviewDocument(null)}>
-                  ត្រឡប់ទៅឯកសារ
-                </button>
-              </div>
               <DocumentPreview
                 meeting={meeting}
                 document={draftPreviewDocument}
-                activePanel={activePanel}
                 readOnlyComments
+                toolbarStart={(
+                  <button className="btn btn-sm btn-secondary back-to-document-list-button" type="button" onClick={() => setDraftPreviewDocument(null)}>
+                    ត្រឡប់ទៅឯកសារ
+                  </button>
+                )}
               />
             </div>
           ) : (
@@ -740,7 +706,7 @@ function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, sho
   )
 }
 
-function DocumentPreview({ meeting, document, activePanel: externalActivePanel, readOnlyComments = false }) {
+function DocumentPreview({ meeting, document, activePanel: externalActivePanel, readOnlyComments = false, toolbarStart = null }) {
   const [localActivePanel, setLocalActivePanel] = useState(null)
   const [commentText, setCommentText] = useState('')
   const [comments, setComments] = useState([])
@@ -845,7 +811,7 @@ function DocumentPreview({ meeting, document, activePanel: externalActivePanel, 
         <div className="pdf-workspace">
           {externalActivePanel === undefined ? (
             <div className="pdf-viewer-top">
-              <span />
+              <div className="pdf-toolbar-start">{toolbarStart}</div>
               <span />
               <div className="pdf-actions">
                 <button
@@ -1082,7 +1048,7 @@ function displayCategory(category) {
   const labels = {
     Agenda: 'របៀបវារៈ',
     Reference: 'ឯកសារយោង',
-    Law: 'ឯកសារច្បាប់',
+    Law: 'ឯកសារបទដ្ឋានគតិយុត្ដ',
     Presentation: 'បទបង្ហាញ',
     Supporting: 'ឯកសារគាំទ្រ',
   }
@@ -1185,7 +1151,7 @@ function DocumentsCard({ meeting, selectedDocument, onSelectDocument, isCollapse
           className="document-sidebar-compact-header"
           type="button"
           onClick={onToggleCollapse}
-          aria-label="បើកឯកសារកិច្ចប្រជុំ"
+          aria-label="បើកឯកសារបទដ្ឋានគតិយុត្ដ"
         >
           ឯកសារ
         </button>
@@ -1212,13 +1178,14 @@ function DocumentsCard({ meeting, selectedDocument, onSelectDocument, isCollapse
     <div className="card sidebar-card">
       <div className="card-header">
         <span className="card-title document-card-title">
-          ឯកសារកិច្ចប្រជុំ
+          <span className="file-glyph" aria-hidden="true" />
+          ឯកសារបទដ្ឋានគតិយុត្ដ
         </span>
         <button
           className="sidebar-toggle-button"
           type="button"
           onClick={onToggleCollapse}
-          aria-label="បិទឯកសារកិច្ចប្រជុំ"
+          aria-label="បិទឯកសារបទដ្ឋានគតិយុត្ដ"
         >
           <span className="sidebar-toggle-icon" aria-hidden="true" />
         </button>
@@ -1533,11 +1500,12 @@ function MeetingDetail({ meetingId }) {
   }
 
   const coordinator = getUserById(meeting.coordinatorId)
+  const isCompactHeader = activePanel !== 'agenda'
 
   return (
     <main className="page-content">
       <div className="meeting-detail">
-        <div className="detail-header card">
+        <div className={`detail-header card ${isCompactHeader ? 'compact-detail-header' : ''}`}>
           <div className="card-body">
             <div className="header-top">
               <div>
@@ -1551,17 +1519,26 @@ function MeetingDetail({ meetingId }) {
                 </div>
               </div>
             </div>
-            <div className="header-info grid-4">
-              <div className="info-item"><span className="info-label">ប្រភេទកិច្ចប្រជុំ</span><span className="info-value">{meeting.meetingType}</span></div>
-              <div className="info-item"><span className="info-label">ស្ថានភាព</span><span className="info-value">{displayMeetingStatus(meeting.status)}</span></div>
-              <div className="info-item"><span className="info-label">របៀបប្រជុំ</span><span className="info-value">{meeting.meetingMode}</span></div>
-              <div className="info-item"><span className="info-label">កម្រិត</span><span className="info-value">{meeting.level}</span></div>
-              <div className="info-item"><span className="info-label">អ្នកចូលរួម</span><span className="info-value">{meeting.expectedAttendees}</span></div>
-              <div className="info-item"><span className="info-label">ភ្ញៀវកិត្តិយស</span><span className="info-value">{meeting.vip}</span></div>
-              <div className="info-item"><span className="info-label">អ្នកសម្របសម្រួល</span><span className="info-value">{getDisplayUserName(coordinator)}</span></div>
-              <div className="info-item"><span className="info-label">តំណកិច្ចប្រជុំ</span><a href={meeting.meetingLink} target="_blank" rel="noreferrer" className="info-value link">{meeting.meetingLink}</a></div>
-              <div className="info-item"><span className="info-label">លេខកូដកិច្ចប្រជុំ</span><span className="info-value code">{meeting.meetingCode}</span></div>
-            </div>
+            {isCompactHeader ? (
+              <div className="header-info compact-header-info">
+                <div className="info-item"><span className="info-label">ប្រភេទកិច្ចប្រជុំ</span><span className="info-value">{meeting.meetingType}</span></div>
+                <div className="info-item"><span className="info-label">ស្ថានភាព</span><span className="info-value">{displayMeetingStatus(meeting.status)}</span></div>
+                <div className="info-item"><span className="info-label">លេខកូដកិច្ចប្រជុំ</span><span className="info-value code">{meeting.meetingCode}</span></div>
+                <div className="info-item compact-link-item"><span className="info-label">តំណកិច្ចប្រជុំ</span><a href={meeting.meetingLink} target="_blank" rel="noreferrer" className="info-value link">{meeting.meetingLink}</a></div>
+              </div>
+            ) : (
+              <div className="header-info grid-4">
+                <div className="info-item"><span className="info-label">ប្រភេទកិច្ចប្រជុំ</span><span className="info-value">{meeting.meetingType}</span></div>
+                <div className="info-item"><span className="info-label">ស្ថានភាព</span><span className="info-value">{displayMeetingStatus(meeting.status)}</span></div>
+                <div className="info-item"><span className="info-label">របៀបប្រជុំ</span><span className="info-value">{meeting.meetingMode}</span></div>
+                <div className="info-item"><span className="info-label">កម្រិត</span><span className="info-value">{meeting.level}</span></div>
+                <div className="info-item"><span className="info-label">អ្នកចូលរួម</span><span className="info-value">{meeting.expectedAttendees}</span></div>
+                <div className="info-item"><span className="info-label">ភ្ញៀវកិត្តិយស</span><span className="info-value">{meeting.vip}</span></div>
+                <div className="info-item"><span className="info-label">អ្នកសម្របសម្រួល</span><span className="info-value">{getDisplayUserName(coordinator)}</span></div>
+                <div className="info-item"><span className="info-label">តំណកិច្ចប្រជុំ</span><a href={meeting.meetingLink} target="_blank" rel="noreferrer" className="info-value link">{meeting.meetingLink}</a></div>
+                <div className="info-item"><span className="info-label">លេខកូដកិច្ចប្រជុំ</span><span className="info-value code">{meeting.meetingCode}</span></div>
+              </div>
+            )}
           </div>
         </div>
 

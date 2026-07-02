@@ -466,6 +466,38 @@ button {
   margin-top: 20px;
 }
 
+.compact-detail-header {
+  margin-bottom: 14px;
+}
+
+.compact-detail-header .card-body {
+  padding: 18px 22px;
+}
+
+.compact-detail-header .detail-title {
+  margin-bottom: 6px;
+  font-size: 22px;
+}
+
+.compact-detail-header .header-meta {
+  gap: 10px;
+}
+
+.compact-detail-header .header-info {
+  margin-top: 14px;
+}
+
+.compact-header-info {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.compact-link-item {
+  grid-column: span 1;
+}
+
 .info-item {
   display: flex;
   flex-direction: column;
@@ -803,6 +835,10 @@ button.agenda-document-title {
   overflow-wrap: anywhere;
 }
 
+.document-card-title .file-glyph {
+  color: var(--color-danger);
+}
+
 .document-header-actions {
   display: inline-flex;
   align-items: center;
@@ -854,8 +890,8 @@ button.agenda-document-title {
 .sidebar-toggle-button:hover,
 .document-icon-only:hover,
 .document-icon-only.selected {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
+  border-color: var(--color-danger);
+  background: var(--color-danger-light);
 }
 
 .sidebar-toggle-icon {
@@ -886,13 +922,13 @@ button.agenda-document-title {
   border: 0;
   border-bottom: 1px solid var(--color-border);
   background: white;
-  color: var(--color-primary);
+  color: var(--color-danger);
   font-weight: 700;
   line-height: 1.35;
 }
 
 .document-sidebar-compact-header:hover {
-  background: var(--color-primary-light);
+  background: var(--color-danger-light);
 }
 
 .document-icon-list {
@@ -906,7 +942,8 @@ button.agenda-document-title {
   position: relative;
   width: 44px;
   height: 44px;
-  color: var(--color-primary);
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 .document-icon-tooltip {
@@ -955,18 +992,18 @@ button.agenda-document-title {
 }
 
 .document-icon-only.icon-reference {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 .document-icon-only.icon-supporting {
-  background: var(--color-success-light);
-  color: #15803d;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 .document-icon-only.icon-presentation {
-  background: var(--color-accent-light);
-  color: #b45309;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 .document-icon-only.icon-law {
@@ -1042,25 +1079,36 @@ button.agenda-document-title {
 }
 
 .document-row:hover {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
+  border-color: var(--color-danger);
+  background: var(--color-danger-light);
 }
 
 .document-row.selected {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
+  border-color: var(--color-danger);
+  background: var(--color-danger-light);
+}
+
+.document-row.category-law:hover,
+.document-row.category-law.selected {
+  border-color: var(--color-danger);
+  background: var(--color-danger-light);
 }
 
 .document-icon {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-sm);
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+  background: var(--color-danger-light);
+  color: var(--color-danger);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.document-row.category-law .document-icon {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 .document-row-copy {
@@ -2554,6 +2602,13 @@ button.agenda-document-title {
   gap: 12px;
 }
 
+.pdf-toolbar-start {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
 .pdf-actions {
   display: inline-flex;
   justify-content: flex-end;
@@ -2935,6 +2990,10 @@ button.agenda-document-title {
 }
 
 @media (max-width: 1100px) {
+  .compact-header-info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .grid-4,
   .grid-3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3002,6 +3061,10 @@ button.agenda-document-title {
   .grid-2,
   .grid-3,
   .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .compact-header-info {
     grid-template-columns: 1fr;
   }
 
