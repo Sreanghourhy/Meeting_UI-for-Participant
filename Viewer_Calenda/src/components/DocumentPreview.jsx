@@ -149,6 +149,7 @@ export default function DocumentPreview({
   participants = [],
   activePanel: externalActivePanel,
   onTogglePanel,
+  showToolbar = true,
   readOnlyComments = false,
   toolbarStart = null,
 }) {
@@ -244,13 +245,15 @@ export default function DocumentPreview({
   return (
     <div className="document-preview">
       <div className="pdf-workspace">
-        <DocumentActionBar
-          activePanel={activePanel}
-          isHighlightMode={isHighlightMode}
-          toolbarStart={toolbarStart}
-          onTogglePanel={handleTogglePanel}
-          onToggleHighlightMode={() => setIsHighlightMode((enabled) => !enabled)}
-        />
+        {showToolbar ? (
+          <DocumentActionBar
+            activePanel={activePanel}
+            isHighlightMode={isHighlightMode}
+            toolbarStart={toolbarStart}
+            onTogglePanel={handleTogglePanel}
+            onToggleHighlightMode={() => setIsHighlightMode((enabled) => !enabled)}
+          />
+        ) : null}
         <div className={`pdf-content-grid ${activePanel ? 'with-panel' : ''}`}>
           <div className="pdf-frame-wrap">
             <PdfDocumentHighlighter

@@ -117,10 +117,13 @@ export default function InlineDocumentPreview({
   headerTabs,
   activePanel,
   showDraftProgress = false,
+  showDocumentToolbar = false,
   onBack,
   onShowDocumentsSidebar,
   onHideDocumentsSidebar,
   onToggleDocumentPanel,
+  documentSidebar,
+  isDocumentSidebarCollapsed = false,
 }) {
   const [draftPreviewDocument, setDraftPreviewDocument] = useState(null)
 
@@ -144,42 +147,48 @@ export default function InlineDocumentPreview({
         )}
       </div>
       <div className="card-body">
-        {showDraftProgress ? (
-          draftPreviewDocument ? (
-            <div className="draft-drilldown">
+        <div className={`inline-document-layout ${documentSidebar ? 'with-sidebar' : ''} ${isDocumentSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+          {documentSidebar ? <aside className="inline-document-sidebar">{documentSidebar}</aside> : null}
+          <div className="inline-document-content">
+            {showDraftProgress ? (
+              draftPreviewDocument ? (
+                <div className="draft-drilldown">
+                  <DocumentPreview
+                    document={draftPreviewDocument}
+                    participants={getMeetingParticipants(meeting)}
+                    readOnlyComments
+                    toolbarStart={(
+                      <button
+                        className="btn btn-sm btn-secondary back-to-document-list-button"
+                        type="button"
+                        onClick={() => {
+                          setDraftPreviewDocument(null)
+                          onHideDocumentsSidebar?.()
+                        }}
+                      >
+                        ត្រឡប់ទៅឯកសារ
+                      </button>
+                    )}
+                  />
+                </div>
+              ) : (
+                <DraftStepDocuments
+                  currentDocument={document}
+                  onSelectDocument={setDraftPreviewDocument}
+                  onShowDocumentsSidebar={onShowDocumentsSidebar}
+                />
+              )
+            ) : (
               <DocumentPreview
-                document={draftPreviewDocument}
+                document={document}
                 participants={getMeetingParticipants(meeting)}
-                readOnlyComments
-                toolbarStart={(
-                  <button
-                    className="btn btn-sm btn-secondary back-to-document-list-button"
-                    type="button"
-                    onClick={() => {
-                      setDraftPreviewDocument(null)
-                      onHideDocumentsSidebar?.()
-                    }}
-                  >
-                    ត្រឡប់ទៅឯកសារ
-                  </button>
-                )}
+                activePanel={activePanel}
+                onTogglePanel={onToggleDocumentPanel}
+                showToolbar={showDocumentToolbar}
               />
-            </div>
-          ) : (
-            <DraftStepDocuments
-              currentDocument={document}
-              onSelectDocument={setDraftPreviewDocument}
-              onShowDocumentsSidebar={onShowDocumentsSidebar}
-            />
-          )
-        ) : (
-          <DocumentPreview
-            document={document}
-            participants={getMeetingParticipants(meeting)}
-            activePanel={activePanel}
-            onTogglePanel={onToggleDocumentPanel}
-          />
-        )}
+            )}
+          </div>
+        </div>
       </div>
     </section>
   )

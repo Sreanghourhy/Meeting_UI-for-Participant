@@ -1205,6 +1205,10 @@ button.agenda-document-title {
   grid-template-columns: 84px minmax(0, 1fr);
 }
 
+.agenda-layout.documents-inline {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .agenda-layout.documents-hidden {
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
@@ -2477,6 +2481,34 @@ button.agenda-document-title {
   overflow: hidden;
 }
 
+.inline-document-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.inline-document-layout.with-sidebar {
+  grid-template-columns: 380px minmax(0, 1fr);
+}
+
+.inline-document-layout.with-sidebar.sidebar-collapsed {
+  grid-template-columns: 84px minmax(0, 1fr);
+}
+
+.inline-document-sidebar,
+.inline-document-content {
+  min-width: 0;
+}
+
+.inline-document-sidebar .card {
+  height: 100%;
+}
+
+.inline-document-layout.with-sidebar .document-sidebar-compact {
+  max-width: 84px;
+}
+
 .document-preview-summary {
   display: flex;
   align-items: flex-start;
@@ -3706,6 +3738,14 @@ button.agenda-document-title {
   }
 
   .agenda-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .inline-document-layout.with-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .inline-document-layout.with-sidebar.sidebar-collapsed {
     grid-template-columns: 1fr;
   }
 

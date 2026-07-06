@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { formatDate, formatTimeRange, getMeetingById, getStatusBadge, getUserById } from '../utils/data.js'
+import { formatDate, formatTimeRange, getMeetingById, getStatusBadge } from '../utils/data.js'
 import { DocumentsCard, getMeetingDraftDocument } from './Documents.jsx'
 import InlineDocumentPreview from './InlineDocumentPreview.jsx'
-import { getDisplayUserName, InlineParticipantsPreview } from './Participants.jsx'
+import { InlineParticipantsPreview } from './Participants.jsx'
 
 function goTo(path) {
   window.location.hash = path
@@ -60,6 +60,17 @@ function displayMeetingStatus(status) {
   return labels[status] || status
 }
 
+function MeetingHeaderInfo({ meeting, compact = false }) {
+  return (
+    <div className={`header-info ${compact ? 'compact-header-info' : 'grid-4'}`}>
+      <div className="info-item"><span className="info-label">ប្រភេទកិច្ចប្រជុំ</span><span className="info-value">{meeting.meetingType}</span></div>
+      <div className="info-item"><span className="info-label">អ្នកចូលរួម</span><span className="info-value attendee-count-text">{meeting.expectedAttendees}</span></div>
+      <div className="info-item"><span className="info-label">លេខកូដកិច្ចប្រជុំ</span><span className="info-value code">{meeting.meetingCode}</span></div>
+      <div className="info-item compact-link-item"><span className="info-label">តំណកិច្ចប្រជុំ</span><a href={meeting.meetingLink} target="_blank" rel="noreferrer" className="info-value link">{meeting.meetingLink}</a></div>
+    </div>
+  )
+}
+
 function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, onShowAgenda, onShowParticipants, onBackToAgenda }) {
   const [isDocumentsCollapsed, setIsDocumentsCollapsed] = useState(false)
   const [documentPanel, setDocumentPanel] = useState(null)
@@ -71,6 +82,7 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
   const isDocumentsHidden = activePanel === 'agenda' ||
     activePanel === 'participants' ||
     (activePanel === 'document' && isDraftDocument && showDraftProgress && !isDraftHistoryPreviewOpen)
+  const isDocumentPanel = activePanel === 'document' && selectedDocument
   const refreshDocumentLayout = () => {
     window.requestAnimationFrame(() => window.dispatchEvent(new Event('resize')))
     window.setTimeout(() => window.dispatchEvent(new Event('resize')), 260)
@@ -139,7 +151,7 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
                 setShowDraftProgress(false)
                 setIsDraftHistoryPreviewOpen(false)
                 onSelectDocument(draftDocument)
-                hideDocumentsSidebar()
+                showDocumentsSidebar()
               }}
             >
               សេចក្តីព្រាង
@@ -165,31 +177,34 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
   )
 
   return (
-    <div className={`agenda-layout ${isDocumentsHidden ? 'documents-hidden' : isDocumentsCollapsed ? 'documents-collapsed' : ''}`}>
-      <aside className="agenda-sidebar">
-        <DocumentsCard
-          meeting={meeting}
-          selectedDocument={selectedDocument}
-          onSelectDocument={(document) => {
-            setShowDraftProgress(false)
-            setIsDraftHistoryPreviewOpen(false)
-            onSelectDocument(document)
-          }}
-          isCollapsed={isDocumentsCollapsed}
-          onToggleCollapse={() => {
-            setIsDocumentsCollapsed((isCollapsed) => !isCollapsed)
-            refreshDocumentLayout()
-          }}
-        />
-      </aside>
+    <div className={`agenda-layout ${isDocumentPanel ? 'documents-inline' : isDocumentsHidden ? 'documents-hidden' : isDocumentsCollapsed ? 'documents-collapsed' : ''}`}>
+      {!isDocumentPanel ? (
+        <aside className="agenda-sidebar">
+          <DocumentsCard
+            meeting={meeting}
+            selectedDocument={selectedDocument}
+            onSelectDocument={(document) => {
+              setShowDraftProgress(false)
+              setIsDraftHistoryPreviewOpen(false)
+              onSelectDocument(document)
+            }}
+            isCollapsed={isDocumentsCollapsed}
+            onToggleCollapse={() => {
+              setIsDocumentsCollapsed((isCollapsed) => !isCollapsed)
+              refreshDocumentLayout()
+            }}
+          />
+        </aside>
+      ) : null}
       <div className="agenda-main">
         {activePanel === 'document' && selectedDocument ? (
           <InlineDocumentPreview
             meeting={meeting}
             document={selectedDocument}
-            headerTabs={isDraftDocument ? panelTabs : null}
+            headerTabs={panelTabs}
             activePanel={isDraftDocument ? documentPanel : null}
             showDraftProgress={isDraftDocument && showDraftProgress}
+            showDocumentToolbar={isDraftDocument && !showDraftProgress}
             onBack={() => {
               setShowDraftProgress(false)
               setIsDraftHistoryPreviewOpen(false)
@@ -202,6 +217,23 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
               setDocumentPanel(documentPanel === panel ? null : panel)
               refreshDocumentLayout()
             }}
+            documentSidebar={!isDocumentsHidden ? (
+              <DocumentsCard
+                meeting={meeting}
+                selectedDocument={selectedDocument}
+                onSelectDocument={(document) => {
+                  setShowDraftProgress(false)
+                  setIsDraftHistoryPreviewOpen(false)
+                  onSelectDocument(document)
+                }}
+                isCollapsed={isDocumentsCollapsed}
+                onToggleCollapse={() => {
+                  setIsDocumentsCollapsed((isCollapsed) => !isCollapsed)
+                  refreshDocumentLayout()
+                }}
+              />
+            ) : null}
+            isDocumentSidebarCollapsed={isDocumentsCollapsed}
           />
         ) : null}
         {activePanel === 'participants' ? <InlineParticipantsPreview meeting={meeting} headerTabs={panelTabs} /> : null}
@@ -280,13 +312,10 @@ export default function MeetingDetail({ meetingId }) {
     )
   }
 
-  const coordinator = getUserById(meeting.coordinatorId)
-  const isCompactHeader = activePanel !== 'agenda'
-
   return (
     <main className="page-content">
       <div className="meeting-detail">
-        <div className={`detail-header card ${isCompactHeader ? 'compact-detail-header' : ''}`}>
+        <div className="detail-header card">
           <div className="card-body">
             <div className="header-top">
               <div>
@@ -305,26 +334,7 @@ export default function MeetingDetail({ meetingId }) {
                 </button>
               </div>
             </div>
-            {isCompactHeader ? (
-              <div className="header-info compact-header-info">
-                <div className="info-item"><span className="info-label">ប្រភេទកិច្ចប្រជុំ</span><span className="info-value">{meeting.meetingType}</span></div>
-                <div className="info-item"><span className="info-label">ស្ថានភាព</span><span className="info-value">{displayMeetingStatus(meeting.status)}</span></div>
-                <div className="info-item"><span className="info-label">លេខកូដកិច្ចប្រជុំ</span><span className="info-value code">{meeting.meetingCode}</span></div>
-                <div className="info-item compact-link-item"><span className="info-label">តំណកិច្ចប្រជុំ</span><a href={meeting.meetingLink} target="_blank" rel="noreferrer" className="info-value link">{meeting.meetingLink}</a></div>
-              </div>
-            ) : (
-              <div className="header-info grid-4">
-                <div className="info-item"><span className="info-label">ប្រភេទកិច្ចប្រជុំ</span><span className="info-value">{meeting.meetingType}</span></div>
-                <div className="info-item"><span className="info-label">ស្ថានភាព</span><span className="info-value">{displayMeetingStatus(meeting.status)}</span></div>
-                <div className="info-item"><span className="info-label">របៀបប្រជុំ</span><span className="info-value">{meeting.meetingMode}</span></div>
-                <div className="info-item"><span className="info-label">កម្រិត</span><span className="info-value">{meeting.level}</span></div>
-                <div className="info-item"><span className="info-label">អ្នកចូលរួម</span><span className="info-value attendee-count-text">{meeting.expectedAttendees}</span></div>
-                <div className="info-item"><span className="info-label">ភ្ញៀវកិត្តិយស</span><span className="info-value">{meeting.vip}</span></div>
-                <div className="info-item"><span className="info-label">អ្នកសម្របសម្រួល</span><span className="info-value">{getDisplayUserName(coordinator)}</span></div>
-                <div className="info-item"><span className="info-label">តំណកិច្ចប្រជុំ</span><a href={meeting.meetingLink} target="_blank" rel="noreferrer" className="info-value link">{meeting.meetingLink}</a></div>
-                <div className="info-item"><span className="info-label">លេខកូដកិច្ចប្រជុំ</span><span className="info-value code">{meeting.meetingCode}</span></div>
-              </div>
-            )}
+            <MeetingHeaderInfo meeting={meeting} />
           </div>
         </div>
 

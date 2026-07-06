@@ -523,6 +523,23 @@ button {
   word-break: break-word;
 }
 
+.attendee-count-text {
+  display: inline-flex;
+  width: fit-content;
+  min-width: 78px;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: var(--color-text);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .info-value.code {
   width: fit-content;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -643,6 +660,10 @@ button.agenda-document-title {
 
 .agenda-layout.documents-collapsed {
   grid-template-columns: 84px minmax(0, 1fr);
+}
+
+.agenda-layout.documents-inline {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .agenda-layout.documents-hidden {
@@ -1888,6 +1909,34 @@ button.agenda-document-title {
   overflow: hidden;
 }
 
+.inline-document-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.inline-document-layout.with-sidebar {
+  grid-template-columns: 380px minmax(0, 1fr);
+}
+
+.inline-document-layout.with-sidebar.sidebar-collapsed {
+  grid-template-columns: 84px minmax(0, 1fr);
+}
+
+.inline-document-sidebar,
+.inline-document-content {
+  min-width: 0;
+}
+
+.inline-document-sidebar .card {
+  height: 100%;
+}
+
+.inline-document-layout.with-sidebar .document-sidebar-compact {
+  max-width: 84px;
+}
+
 .document-preview-summary {
   display: flex;
   align-items: flex-start;
@@ -3109,6 +3158,14 @@ button.agenda-document-title {
   }
 
   .agenda-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .inline-document-layout.with-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .inline-document-layout.with-sidebar.sidebar-collapsed {
     grid-template-columns: 1fr;
   }
 
