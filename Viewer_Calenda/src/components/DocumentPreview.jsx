@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   PdfDocumentHighlighter,
   PdfHighlightButton,
@@ -149,6 +149,7 @@ export default function DocumentPreview({
   participants = [],
   activePanel: externalActivePanel,
   onTogglePanel,
+  onPanelOpen,
   showToolbar = true,
   readOnlyComments = false,
   toolbarStart = null,
@@ -158,6 +159,7 @@ export default function DocumentPreview({
   const [comments, setComments] = useState([])
   const [noteText, setNoteText] = useState('')
   const [isHighlightMode, setIsHighlightMode] = useState(false)
+  const pdfFrameRef = useRef(null)
   const {
     highlights,
     addHighlight,
@@ -192,13 +194,34 @@ export default function DocumentPreview({
     })
   }, [activePanel])
 
+  useEffect(() => {
+    const frame = pdfFrameRef.current
+    if (!frame || typeof ResizeObserver === 'undefined') return undefined
+
+    let animationFrame = 0
+    const observer = new ResizeObserver(() => {
+      window.cancelAnimationFrame(animationFrame)
+      animationFrame = window.requestAnimationFrame(() => {
+        window.dispatchEvent(new Event('resize'))
+      })
+    })
+
+    observer.observe(frame)
+    return () => {
+      window.cancelAnimationFrame(animationFrame)
+      observer.disconnect()
+    }
+  }, [document.id])
+
   function handleTogglePanel(panel) {
+    const nextPanel = activePanel === panel ? null : panel
     if (externalActivePanel !== undefined && onTogglePanel) {
       onTogglePanel(panel)
       return
     }
 
-    setLocalActivePanel(activePanel === panel ? null : panel)
+    setLocalActivePanel(nextPanel)
+    if (nextPanel) onPanelOpen?.(nextPanel)
   }
 
   function handleCommentSubmit(event) {
@@ -255,7 +278,7 @@ export default function DocumentPreview({
           />
         ) : null}
         <div className={`pdf-content-grid ${activePanel ? 'with-panel' : ''}`}>
-          <div className="pdf-frame-wrap">
+          <div className="pdf-frame-wrap" ref={pdfFrameRef}>
             <PdfDocumentHighlighter
               documentUrl={document.url}
               highlights={highlights}

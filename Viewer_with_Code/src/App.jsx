@@ -91,7 +91,9 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
   const isDocumentPanel = activePanel === 'document' && selectedDocument
   const refreshDocumentLayout = () => {
     window.requestAnimationFrame(() => window.dispatchEvent(new Event('resize')))
-    window.setTimeout(() => window.dispatchEvent(new Event('resize')), 260)
+    ;[80, 180, 320].forEach((delay) => {
+      window.setTimeout(() => window.dispatchEvent(new Event('resize')), delay)
+    })
   }
   const hideDocumentsSidebar = () => {
     setIsDocumentsCollapsed(true)
@@ -219,8 +221,11 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
             }}
             onShowDocumentsSidebar={showDocumentsSidebar}
             onHideDocumentsSidebar={hideDraftHistorySidebar}
+            onCollapseDocumentsSidebar={hideDocumentsSidebar}
             onToggleDocumentPanel={(panel) => {
-              setDocumentPanel(documentPanel === panel ? null : panel)
+              const nextPanel = documentPanel === panel ? null : panel
+              setDocumentPanel(nextPanel)
+              if (nextPanel) setIsDocumentsCollapsed(true)
               refreshDocumentLayout()
             }}
             documentSidebar={!isDocumentsHidden ? (

@@ -121,6 +121,7 @@ export default function InlineDocumentPreview({
   onBack,
   onShowDocumentsSidebar,
   onHideDocumentsSidebar,
+  onCollapseDocumentsSidebar,
   onToggleDocumentPanel,
   documentSidebar,
   isDocumentSidebarCollapsed = false,
@@ -157,6 +158,7 @@ export default function InlineDocumentPreview({
                     document={draftPreviewDocument}
                     participants={getMeetingParticipants(meeting)}
                     readOnlyComments
+                    onPanelOpen={onCollapseDocumentsSidebar}
                     toolbarStart={(
                       <button
                         className="btn btn-sm btn-secondary back-to-document-list-button"
