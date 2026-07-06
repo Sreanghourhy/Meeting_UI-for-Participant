@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { AreaHighlight, Highlight, PdfHighlighter, PdfLoader } from 'react-pdf-highlighter'
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url'
 import {
   formatDate,
   formatTimeRange,
@@ -1119,12 +1121,15 @@ function DocumentPreview({ meeting, document, activePanel: externalActivePanel, 
   const [commentText, setCommentText] = useState('')
   const [comments, setComments] = useState([])
   const [noteText, setNoteText] = useState('')
+  const [highlights, setHighlights] = useState([])
+  const [isHighlightMode, setIsHighlightMode] = useState(false)
   const participants = meeting ? getMeetingParticipants(meeting) : []
   const activePanel = externalActivePanel !== undefined ? externalActivePanel : localActivePanel
 
   useEffect(() => {
     const savedComments = window.localStorage.getItem(`document-comments:${document.id}`)
     const savedNote = window.localStorage.getItem(`document-note:${document.id}`)
+    const savedHighlights = window.localStorage.getItem(`document-highlights:${document.id}`)
     const starterParticipants = participants.slice(0, 3)
     setComments(savedComments ? JSON.parse(savedComments) : [
       ...starterParticipants.map((participant, index) => ({
@@ -1140,6 +1145,8 @@ function DocumentPreview({ meeting, document, activePanel: externalActivePanel, 
       })),
     ])
     setNoteText(savedNote || '')
+    setHighlights(savedHighlights ? JSON.parse(savedHighlights) : [])
+    setIsHighlightMode(false)
     setLocalActivePanel(null)
     setCommentText('')
   }, [document.id, document.name, meeting?.id])
@@ -1153,6 +1160,10 @@ function DocumentPreview({ meeting, document, activePanel: externalActivePanel, 
   useEffect(() => {
     window.localStorage.setItem(`document-note:${document.id}`, noteText)
   }, [noteText, document.id])
+
+  useEffect(() => {
+    window.localStorage.setItem(`document-highlights:${document.id}`, JSON.stringify(highlights))
+  }, [highlights, document.id])
 
   useEffect(() => {
     window.requestAnimationFrame(() => {
@@ -1213,6 +1224,43 @@ function DocumentPreview({ meeting, document, activePanel: externalActivePanel, 
     ][index] || `${participant.name} បានទទួលចំណុចនេះ។`
   }
 
+  function addHighlight(position, content, hideSelection) {
+    const text = content.text?.trim()
+    setHighlights((current) => [
+      {
+        id: `highlight-${Date.now()}`,
+        position,
+        content,
+        comment: {
+          text: text || 'Highlighted section',
+          emoji: '',
+        },
+      },
+      ...current,
+    ])
+    hideSelection()
+  }
+
+  function updateAreaHighlight(highlightId, position, content) {
+    setHighlights((current) => current.map((highlight) => {
+      if (highlight.id !== highlightId) return highlight
+
+      return {
+        ...highlight,
+        position,
+        content: content || highlight.content,
+      }
+    }))
+  }
+
+  function isAreaHighlight(highlight) {
+    return Boolean(highlight.content?.image)
+  }
+
+  function clearHighlights() {
+    setHighlights([])
+  }
+
   return (
     <div className="document-preview">
       {document.url ? (
@@ -1236,17 +1284,97 @@ function DocumentPreview({ meeting, document, activePanel: externalActivePanel, 
                 >
                   កំណត់ចំណាំ
                 </button>
+                <button
+                  className={`pdf-action-button highlighter-button ${isHighlightMode ? 'active' : ''}`}
+                  type="button"
+                  onClick={() => setIsHighlightMode((enabled) => !enabled)}
+                  aria-pressed={isHighlightMode}
+                  title="Highlight pen"
+                >
+                  <span className="pen-icon" aria-hidden="true" />
+                  Highlight
+                </button>
               </div>
             </div>
           ) : null}
           <div className={`pdf-content-grid ${activePanel ? 'with-panel' : ''}`}>
             <div className="pdf-frame-wrap">
-              <iframe
-                key={document.url}
-                className="document-pdf-frame"
-                src={`${document.url}#toolbar=0&navpanes=0&view=FitH&zoom=page-width`}
-                title={displayCategory(document.category)}
-              />
+              {externalActivePanel !== undefined ? (
+                <div className="pdf-floating-actions">
+                  <button
+                    className={`pdf-action-button highlighter-button ${isHighlightMode ? 'active' : ''}`}
+                    type="button"
+                    onClick={() => setIsHighlightMode((enabled) => !enabled)}
+                    aria-pressed={isHighlightMode}
+                    title="Highlight pen"
+                  >
+                    <span className="pen-icon" aria-hidden="true" />
+                    Highlight
+                  </button>
+                </div>
+              ) : null}
+              <div className={`document-pdf-frame highlighter-frame ${isHighlightMode ? 'pen-active' : ''}`}>
+                <PdfLoader
+                  key={document.url}
+                  url={document.url}
+                  workerSrc={pdfWorkerUrl}
+                  beforeLoad={<div className="pdf-loader-state">Loading PDF...</div>}
+                  errorMessage={<div className="pdf-loader-state error">Unable to load this PDF.</div>}
+                >
+                  {(pdfDocument) => (
+                    <PdfHighlighter
+                      pdfDocument={pdfDocument}
+                      pdfScaleValue="page-width"
+                      highlights={highlights}
+                      onScrollChange={() => {}}
+                      scrollRef={() => {}}
+                      enableAreaSelection={() => isHighlightMode}
+                      onSelectionFinished={(position, content, hideTipAndSelection) => {
+                        if (!isHighlightMode) return null
+
+                        addHighlight(position, content, hideTipAndSelection)
+                        return null
+                      }}
+                      highlightTransform={(highlight, index, setTip, hideTip, viewportToScaled, screenshot, isScrolledTo) => {
+                        if (isAreaHighlight(highlight)) {
+                          return (
+                            <AreaHighlight
+                              key={highlight.id || index}
+                              highlight={highlight}
+                              isScrolledTo={isScrolledTo}
+                              onChange={(boundingRect) => {
+                                const nextPosition = {
+                                  boundingRect: viewportToScaled(boundingRect),
+                                  rects: [],
+                                  pageNumber: boundingRect.pageNumber || highlight.position.pageNumber,
+                                }
+                                updateAreaHighlight(highlight.id, nextPosition, {
+                                  image: screenshot(boundingRect),
+                                })
+                              }}
+                            />
+                          )
+                        }
+
+                        return (
+                          <Highlight
+                            key={highlight.id || index}
+                            position={highlight.position}
+                            comment={highlight.comment}
+                            isScrolledTo={isScrolledTo}
+                          />
+                        )
+                      }}
+                    />
+                  )}
+                </PdfLoader>
+              </div>
+              <div className="pdf-highlight-status">
+                <span>{highlights.length} pen marks</span>
+                {highlights.length ? (
+                  <button type="button" onClick={clearHighlights}>Clear</button>
+                ) : null}
+              </div>
             </div>
             {activePanel === 'comments' ? (
               <section className="document-side-panel chat-panel">

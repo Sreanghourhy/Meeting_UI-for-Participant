@@ -2635,6 +2635,47 @@ button.agenda-document-title {
   color: var(--color-primary);
 }
 
+.highlighter-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pen-icon {
+  position: relative;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  transform: rotate(-38deg);
+}
+
+.pen-icon::before,
+.pen-icon::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  width: 4px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.pen-icon::before {
+  top: 0;
+  height: 10px;
+}
+
+.pen-icon::after {
+  top: 10px;
+  width: 0;
+  height: 0;
+  left: 3px;
+  background: transparent;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  border-radius: 0;
+}
+
 .document-side-panel {
   display: grid;
   align-content: start;
@@ -2851,6 +2892,65 @@ button.agenda-document-title {
   position: relative;
   min-width: 0;
   min-height: clamp(520px, 72vh, 760px);
+}
+
+.highlighter-frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.highlighter-frame.pen-active {
+  cursor: text;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.28);
+}
+
+.pdf-loader-state {
+  min-height: clamp(520px, 72vh, 760px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: var(--color-text-muted);
+  font-weight: 800;
+  text-align: center;
+}
+
+.pdf-loader-state.error {
+  color: #b91c1c;
+}
+
+.pdf-floating-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 8;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.pdf-highlight-status {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 8;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: var(--shadow-sm);
+}
+
+.pdf-highlight-status button {
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font: inherit;
+  cursor: pointer;
 }
 
 .pdf-content-grid {
