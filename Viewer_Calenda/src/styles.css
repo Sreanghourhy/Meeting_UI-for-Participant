@@ -1067,8 +1067,20 @@ button {
 }
 
 .attendee-count-text {
+  display: inline-flex;
+  width: fit-content;
+  min-width: 78px;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #f8fafc;
   color: var(--color-text);
   font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .info-value.code {
@@ -1193,6 +1205,15 @@ button.agenda-document-title {
   grid-template-columns: 84px minmax(0, 1fr);
 }
 
+.agenda-layout.documents-hidden {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.agenda-layout.documents-hidden .agenda-sidebar {
+  display: none;
+}
+
 .agenda-layout > * {
   min-width: 0;
 }
@@ -1307,21 +1328,24 @@ button.agenda-document-title {
 }
 
 .progress-legend {
-  display: grid;
-  grid-template-columns: repeat(3, max-content);
+  display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
   font-size: 13px;
   color: var(--color-text-secondary);
   white-space: nowrap;
+  flex-wrap: nowrap;
 }
 
 .progress-legend span {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 5px;
   min-height: 28px;
+  white-space: nowrap;
 }
 
 .legend-dot {

@@ -645,6 +645,15 @@ button.agenda-document-title {
   grid-template-columns: 84px minmax(0, 1fr);
 }
 
+.agenda-layout.documents-hidden {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.agenda-layout.documents-hidden .agenda-sidebar {
+  display: none;
+}
+
 .agenda-layout > * {
   min-width: 0;
 }

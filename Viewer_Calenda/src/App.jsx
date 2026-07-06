@@ -666,21 +666,37 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
   const [isDocumentsCollapsed, setIsDocumentsCollapsed] = useState(false)
   const [documentPanel, setDocumentPanel] = useState(null)
   const [showDraftProgress, setShowDraftProgress] = useState(false)
+  const [isDraftHistoryPreviewOpen, setIsDraftHistoryPreviewOpen] = useState(false)
   const sessionAgenda = (session) => (meeting.agenda || []).filter((item) => item.session === session)
   const draftDocument = getMeetingDraftDocument(meeting)
   const isDraftDocument = selectedDocument?.id === draftDocument?.id
+  const isDocumentsHidden = activePanel === 'agenda' ||
+    activePanel === 'participants' ||
+    (activePanel === 'document' && isDraftDocument && showDraftProgress && !isDraftHistoryPreviewOpen)
   const refreshDocumentLayout = () => {
     window.requestAnimationFrame(() => window.dispatchEvent(new Event('resize')))
     window.setTimeout(() => window.dispatchEvent(new Event('resize')), 260)
   }
-  const collapseDocumentsSidebar = () => {
+  const hideDocumentsSidebar = () => {
     setIsDocumentsCollapsed(true)
+    refreshDocumentLayout()
+  }
+  const showDocumentsSidebar = () => {
+    setIsDraftHistoryPreviewOpen(true)
+    setIsDocumentsCollapsed(false)
+    refreshDocumentLayout()
+  }
+  const hideDraftHistorySidebar = () => {
+    setIsDraftHistoryPreviewOpen(false)
     refreshDocumentLayout()
   }
 
   useEffect(() => {
     setDocumentPanel(null)
-    setShowDraftProgress(false)
+    if (activePanel !== 'document') {
+      setShowDraftProgress(false)
+      setIsDraftHistoryPreviewOpen(false)
+    }
   }, [activePanel, selectedDocument?.id])
 
   const panelTabs = (
@@ -691,7 +707,12 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
           type="button"
           role="tab"
           aria-selected={activePanel === 'agenda'}
-          onClick={onShowAgenda}
+          onClick={() => {
+            setShowDraftProgress(false)
+            setIsDraftHistoryPreviewOpen(false)
+            onShowAgenda()
+            hideDocumentsSidebar()
+          }}
         >
           របៀបវារៈ
         </button>
@@ -700,7 +721,12 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
           type="button"
           role="tab"
           aria-selected={activePanel === 'participants'}
-          onClick={onShowParticipants}
+          onClick={() => {
+            setShowDraftProgress(false)
+            setIsDraftHistoryPreviewOpen(false)
+            onShowParticipants()
+            hideDocumentsSidebar()
+          }}
         >
           ប្លង់កៅអី
         </button>
@@ -713,8 +739,9 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
               aria-selected={activePanel === 'document' && isDraftDocument && !showDraftProgress}
               onClick={() => {
                 setShowDraftProgress(false)
+                setIsDraftHistoryPreviewOpen(false)
                 onSelectDocument(draftDocument)
-                collapseDocumentsSidebar()
+                hideDocumentsSidebar()
               }}
             >
               សេចក្តីព្រាង
@@ -726,8 +753,9 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
               aria-selected={activePanel === 'document' && isDraftDocument && showDraftProgress}
               onClick={() => {
                 setShowDraftProgress(true)
+                setIsDraftHistoryPreviewOpen(false)
                 onSelectDocument(draftDocument)
-                collapseDocumentsSidebar()
+                hideDraftHistorySidebar()
               }}
             >
               កំណត់ត្រាសេចក្តីព្រាង
@@ -735,40 +763,20 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
           </>
         ) : null}
       </div>
-      {activePanel === 'document' && selectedDocument && isDraftDocument && !showDraftProgress ? (
-        <div className="agenda-document-actions">
-          <button
-            className={`pdf-action-button ${documentPanel === 'comments' ? 'active' : ''}`}
-            type="button"
-            onClick={() => {
-              setDocumentPanel(documentPanel === 'comments' ? null : 'comments')
-              refreshDocumentLayout()
-            }}
-          >
-            មតិយោបល់
-          </button>
-          <button
-            className={`pdf-action-button ${documentPanel === 'note' ? 'active' : ''}`}
-            type="button"
-            onClick={() => {
-              setDocumentPanel(documentPanel === 'note' ? null : 'note')
-              refreshDocumentLayout()
-            }}
-          >
-            កំណត់ចំណាំ
-          </button>
-        </div>
-      ) : null}
     </div>
   )
 
   return (
-    <div className={`agenda-layout ${isDocumentsCollapsed ? 'documents-collapsed' : ''}`}>
+    <div className={`agenda-layout ${isDocumentsHidden ? 'documents-hidden' : isDocumentsCollapsed ? 'documents-collapsed' : ''}`}>
       <aside className="agenda-sidebar">
         <DocumentsCard
           meeting={meeting}
           selectedDocument={selectedDocument}
-          onSelectDocument={onSelectDocument}
+          onSelectDocument={(document) => {
+            setShowDraftProgress(false)
+            setIsDraftHistoryPreviewOpen(false)
+            onSelectDocument(document)
+          }}
           isCollapsed={isDocumentsCollapsed}
           onToggleCollapse={() => {
             setIsDocumentsCollapsed((isCollapsed) => !isCollapsed)
@@ -784,8 +792,18 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
             headerTabs={isDraftDocument ? panelTabs : null}
             activePanel={isDraftDocument ? documentPanel : null}
             showDraftProgress={isDraftDocument && showDraftProgress}
-            onBack={onBackToAgenda}
-            onCollapseDocumentsSidebar={collapseDocumentsSidebar}
+            onBack={() => {
+              setShowDraftProgress(false)
+              setIsDraftHistoryPreviewOpen(false)
+              onBackToAgenda()
+              hideDocumentsSidebar()
+            }}
+            onShowDocumentsSidebar={showDocumentsSidebar}
+            onHideDocumentsSidebar={hideDraftHistorySidebar}
+            onToggleDocumentPanel={(panel) => {
+              setDocumentPanel(documentPanel === panel ? null : panel)
+              refreshDocumentLayout()
+            }}
           />
         ) : null}
         {activePanel === 'participants' ? <InlineParticipantsPreview meeting={meeting} headerTabs={panelTabs} /> : null}
@@ -886,7 +904,7 @@ function getDraftStepDocuments(meeting, currentDocument, stepId) {
 function getDraftHistoryDocuments(currentDocument) {
   let draftVersion = 0
 
-  return draftStatusHistory.flatMap((stage, stageIndex) => (
+  const documents = draftStatusHistory.flatMap((stage, stageIndex) => (
     Array.from({ length: stage.versions }, (_, versionIndex) => {
       draftVersion += 1
 
@@ -900,6 +918,8 @@ function getDraftHistoryDocuments(currentDocument) {
       }
     })
   ))
+
+  return documents.reverse()
 }
 
 function getDraftStatusClass(status) {
@@ -990,7 +1010,7 @@ function DraftDatePicker({ value, onChange }) {
   )
 }
 
-function DraftStepDocuments({ currentDocument, onSelectDocument, onCollapseDocumentsSidebar }) {
+function DraftStepDocuments({ currentDocument, onSelectDocument, onShowDocumentsSidebar }) {
   const [statusFilter, setStatusFilter] = useState('')
   const documents = getDraftHistoryDocuments(currentDocument)
   const statusCounts = draftStatusHistory.reduce((counts, stage) => ({
@@ -1041,7 +1061,7 @@ function DraftStepDocuments({ currentDocument, onSelectDocument, onCollapseDocum
               type="button"
               onClick={() => {
                 onSelectDocument(document)
-                onCollapseDocumentsSidebar?.()
+                onShowDocumentsSidebar?.()
               }}
             >
               <span className="document-row-copy">
@@ -1059,7 +1079,7 @@ function DraftStepDocuments({ currentDocument, onSelectDocument, onCollapseDocum
   )
 }
 
-function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, showDraftProgress = false, onBack, onCollapseDocumentsSidebar }) {
+function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, showDraftProgress = false, onBack, onShowDocumentsSidebar, onHideDocumentsSidebar, onToggleDocumentPanel }) {
   const [selectedDraftStep, setSelectedDraftStep] = useState(1)
   const [draftPreviewDocument, setDraftPreviewDocument] = useState(null)
 
@@ -1091,7 +1111,14 @@ function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, sho
                 document={draftPreviewDocument}
                 readOnlyComments
                 toolbarStart={(
-                  <button className="btn btn-sm btn-secondary back-to-document-list-button" type="button" onClick={() => setDraftPreviewDocument(null)}>
+                  <button
+                    className="btn btn-sm btn-secondary back-to-document-list-button"
+                    type="button"
+                    onClick={() => {
+                      setDraftPreviewDocument(null)
+                      onHideDocumentsSidebar?.()
+                    }}
+                  >
                     ត្រឡប់ទៅឯកសារ
                   </button>
                 )}
@@ -1101,7 +1128,7 @@ function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, sho
             <DraftStepDocuments
               currentDocument={document}
               onSelectDocument={setDraftPreviewDocument}
-              onCollapseDocumentsSidebar={onCollapseDocumentsSidebar}
+              onShowDocumentsSidebar={onShowDocumentsSidebar}
             />
           )
         ) : (
@@ -1109,6 +1136,7 @@ function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, sho
             meeting={meeting}
             document={document}
             activePanel={activePanel}
+            onTogglePanel={onToggleDocumentPanel}
           />
         )}
       </div>
@@ -1116,7 +1144,7 @@ function InlineDocumentPreview({ meeting, document, headerTabs, activePanel, sho
   )
 }
 
-function DocumentPreview({ meeting, document, activePanel: externalActivePanel, readOnlyComments = false, toolbarStart = null }) {
+function DocumentPreview({ meeting, document, activePanel: externalActivePanel, onTogglePanel, readOnlyComments = false, toolbarStart = null }) {
   const [localActivePanel, setLocalActivePanel] = useState(null)
   const [commentText, setCommentText] = useState('')
   const [comments, setComments] = useState([])
@@ -1205,6 +1233,15 @@ function DocumentPreview({ meeting, document, activePanel: externalActivePanel, 
     })
   }
 
+  function handleTogglePanel(panel) {
+    if (externalActivePanel !== undefined && onTogglePanel) {
+      onTogglePanel(panel)
+      return
+    }
+
+    setLocalActivePanel(activePanel === panel ? null : panel)
+  }
+
   function getParticipantReply(participant, message, index) {
     const normalized = message.toLowerCase()
     if (normalized.includes('សង្ខេប') || normalized.includes('summary')) {
@@ -1265,54 +1302,38 @@ function DocumentPreview({ meeting, document, activePanel: externalActivePanel, 
     <div className="document-preview">
       {document.url ? (
         <div className="pdf-workspace">
-          {externalActivePanel === undefined ? (
-            <div className="pdf-viewer-top">
-              <div className="pdf-toolbar-start">{toolbarStart}</div>
-              <span />
-              <div className="pdf-actions">
-                <button
-                  className={`pdf-action-button ${activePanel === 'comments' ? 'active' : ''}`}
-                  type="button"
-                  onClick={() => setLocalActivePanel(activePanel === 'comments' ? null : 'comments')}
-                >
-                  មតិយោបល់
-                </button>
-                <button
-                  className={`pdf-action-button ${activePanel === 'note' ? 'active' : ''}`}
-                  type="button"
-                  onClick={() => setLocalActivePanel(activePanel === 'note' ? null : 'note')}
-                >
-                  កំណត់ចំណាំ
-                </button>
-                <button
-                  className={`pdf-action-button highlighter-button ${isHighlightMode ? 'active' : ''}`}
-                  type="button"
-                  onClick={() => setIsHighlightMode((enabled) => !enabled)}
-                  aria-pressed={isHighlightMode}
-                  title="Highlight pen"
-                >
-                  <span className="pen-icon" aria-hidden="true" />
-                  Highlight
-                </button>
-              </div>
+          <div className="pdf-viewer-top">
+            <div className="pdf-toolbar-start">{toolbarStart}</div>
+            <span />
+            <div className="pdf-actions">
+              <button
+                className={`pdf-action-button ${activePanel === 'comments' ? 'active' : ''}`}
+                type="button"
+                onClick={() => handleTogglePanel('comments')}
+              >
+                មតិយោបល់
+              </button>
+              <button
+                className={`pdf-action-button ${activePanel === 'note' ? 'active' : ''}`}
+                type="button"
+                onClick={() => handleTogglePanel('note')}
+              >
+                កំណត់ចំណាំ
+              </button>
+              <button
+                className={`pdf-action-button highlighter-button ${isHighlightMode ? 'active' : ''}`}
+                type="button"
+                onClick={() => setIsHighlightMode((enabled) => !enabled)}
+                aria-pressed={isHighlightMode}
+                title="Highlight pen"
+              >
+                <span className="pen-icon" aria-hidden="true" />
+                Highlight
+              </button>
             </div>
-          ) : null}
+          </div>
           <div className={`pdf-content-grid ${activePanel ? 'with-panel' : ''}`}>
             <div className="pdf-frame-wrap">
-              {externalActivePanel !== undefined ? (
-                <div className="pdf-floating-actions">
-                  <button
-                    className={`pdf-action-button highlighter-button ${isHighlightMode ? 'active' : ''}`}
-                    type="button"
-                    onClick={() => setIsHighlightMode((enabled) => !enabled)}
-                    aria-pressed={isHighlightMode}
-                    title="Highlight pen"
-                  >
-                    <span className="pen-icon" aria-hidden="true" />
-                    Highlight
-                  </button>
-                </div>
-              ) : null}
               <div className={`document-pdf-frame highlighter-frame ${isHighlightMode ? 'pen-active' : ''}`}>
                 <PdfLoader
                   key={document.url}
