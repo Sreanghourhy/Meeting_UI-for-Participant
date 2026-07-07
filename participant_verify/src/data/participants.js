@@ -1,0 +1,58 @@
+export const participants = [
+  {
+    id: 1,
+    name: 'ឯកឧត្តម ហ៊ីង ថូរ៉ាក់ស៊ី',
+    department: 'ទីស្តីការគណៈរដ្ឋមន្ត្រី',
+    position: 'រដ្ឋលេខាធិការប្រចាំការ',
+    photo: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=320&q=80',
+  },
+  {
+    id: 2,
+    name: 'ឯកឧត្តម ឆាយ រៀន',
+    department: 'នាយកដ្ឋានសម្របសម្រួលគោលនយោបាយ',
+    position: 'រដ្ឋលេខាធិការ',
+    photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=320&q=80',
+  },
+  {
+    id: 3,
+    name: 'ឯកឧត្តម អេង ទូច',
+    department: 'នាយកដ្ឋានបម្លែងឌីជីថល',
+    position: 'រដ្ឋលេខាធិការ',
+    photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=320&q=80',
+  },
+  {
+    id: 4,
+    name: 'ឯកឧត្តមបណ្ឌិត ស៊ា ម៉ៅ',
+    department: 'នាយកដ្ឋានរដ្ឋបាល',
+    position: 'អនុរដ្ឋលេខាធិការ',
+    photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=320&q=80',
+  },
+  {
+    id: 5,
+    name: 'ឯកឧត្តម លី ច័ន្ទតុលា',
+    department: 'នាយកដ្ឋានហិរញ្ញវត្ថុ និងលទ្ធកម្ម',
+    position: 'អគ្គនាយក',
+    photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=320&q=80',
+  },
+  {
+    id: 6,
+    name: 'ឯកឧត្តម អ៊ឹង សេរីវិសុទ្ធ',
+    department: 'នាយកដ្ឋានធនធានមនុស្ស',
+    position: 'អគ្គនាយករង',
+    photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=320&q=80',
+  },
+  {
+    id: 7,
+    name: 'ឯកឧត្តម លីវ សុវណ្ណ',
+    department: 'នាយកដ្ឋានកិច្ចការច្បាប់',
+    position: 'ប្រធាននាយកដ្ឋាន',
+    photo: 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=320&q=80',
+  },
+  {
+    id: 8,
+    name: 'ឯកឧត្តម ឃីម រស្មីដា',
+    department: 'នាយកដ្ឋានពិធីការ',
+    position: 'ប្រធានការិយាល័យ',
+    photo: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=320&q=80',
+  },
+]

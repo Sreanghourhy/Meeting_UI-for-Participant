@@ -1,0 +1,33 @@
+import { useState } from 'react'
+import AccessCodePage from './components/AccessCodePage.jsx'
+import ParticipantList from './components/ParticipantList.jsx'
+import { participants } from './data/participants.js'
+import { getParticipantIdForCode } from './data/passcodes.js'
+
+export default function App() {
+  const [verifiedCode, setVerifiedCode] = useState('')
+  const [verifiedParticipantIds, setVerifiedParticipantIds] = useState([])
+
+  function verifyParticipant(participantId) {
+    if (participantId !== getParticipantIdForCode(verifiedCode)) {
+      return false
+    }
+
+    setVerifiedParticipantIds((currentIds) => (
+      currentIds.includes(participantId) ? currentIds : [...currentIds, participantId]
+    ))
+    return true
+  }
+
+  if (!verifiedCode) {
+    return <AccessCodePage onSuccess={setVerifiedCode} />
+  }
+
+  return (
+    <ParticipantList
+      participants={participants}
+      verifiedParticipantIds={verifiedParticipantIds}
+      onVerifyParticipant={verifyParticipant}
+    />
+  )
+}
