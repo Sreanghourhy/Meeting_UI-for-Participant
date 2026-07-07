@@ -1,0 +1,270 @@
+const asset = (name) => `/assets/${name}`
+const roomAsset = (room, name) => `/assets/${room}/${name}`
+
+const sharedRoom708Steps = [
+  {
+    src: roomAsset('708', 'elevator.jpg'),
+    title: 'ជំហានទី ២៖ ទៅដល់ជណ្តើរយន្ត',
+    text: 'បន្តដើរទៅកាន់ជណ្តើរយន្ត។ ប្រើរូបភាពនេះដើម្បីផ្ទៀងផ្ទាត់ថាអ្នកបានមកដល់ចំណុចត្រឹមត្រូវ។',
+  },
+  {
+    src: roomAsset('708', 'choice_nunber.png'),
+    title: 'ជំហានទី ៣៖ ជ្រើសរើសជាន់ទី ៧',
+    text: 'នៅក្នុងជណ្តើរយន្ត សូមជ្រើសរើសជាន់ទី ៧ ដើម្បីទៅកាន់បន្ទប់ 708។',
+  },
+  {
+    src: roomAsset('708', 'out_turn_left.png'),
+    title: 'ជំហានទី ៤៖ ចេញពីជណ្តើរយន្ត ហើយបត់ឆ្វេង',
+    text: 'ពេលចេញពីជណ្តើរយន្ត សូមបត់ទៅខាងឆ្វេងតាមទិសដៅដែលបង្ហាញក្នុងរូបភាព។',
+  },
+  {
+    src: roomAsset('708', 'turn_right_for_room708.png'),
+    title: 'ជំហានទី ៥៖ បត់ស្តាំទៅបន្ទប់ 708',
+    text: 'បន្តដើរតាមផ្លូវ ហើយបត់ស្តាំនៅចំណុចនេះ ដើម្បីទៅកាន់បន្ទប់ 708។',
+  },
+  {
+    src: roomAsset('708', 'done.jpg'),
+    title: 'ជំហានទី ៦៖ ទៅដល់បន្ទប់ 708',
+    text: 'អ្នកបានទៅដល់បន្ទប់ 708 ហើយ។ សូមពិនិត្យស្លាកបន្ទប់មុនពេលចូល។',
+  },
+]
+
+const room708Guides = {
+  'door-1': [
+    {
+      src: roomAsset('708', 'South.png'),
+      title: 'ជំហានទី ១៖ ចាប់ផ្តើមពីច្រកចូលខាងត្បូង',
+      text: 'ចាប់ផ្តើមពីច្រកចូលខាងត្បូង ហើយដើរទៅកាន់តំបន់ជណ្តើរយន្ត។',
+    },
+    ...sharedRoom708Steps,
+  ],
+  'door-2': [
+    {
+      src: roomAsset('708', 'West.png'),
+      title: 'ជំហានទី ១៖ ចាប់ផ្តើមពីច្រកចូលខាងលិច',
+      text: 'ចាប់ផ្តើមពីច្រកចូលខាងលិច ហើយដើរតាមផ្លូវខាងមុខ។',
+    },
+    {
+      src: roomAsset('708', 'west_1.png'),
+      title: 'ជំហានទី ២៖ បន្តពីច្រកចូលខាងលិច',
+      text: 'បន្តដើរតាមច្រកផ្លូវនេះ រហូតដល់ចំណុចបន្ទាប់។',
+    },
+    {
+      src: roomAsset('708', 'go_thought.png'),
+      title: 'ជំហានទី ៣៖ ដើរឆ្លងកាត់ច្រកផ្លូវ',
+      text: 'ដើរឆ្លងកាត់តំបន់នេះ ហើយបន្តទៅរកជណ្តើរយន្ត។',
+    },
+    ...sharedRoom708Steps.map((step, index) => ({
+      ...step,
+      title: step.title.replace(`ជំហានទី ${index + 2}`, `ជំហានទី ${index + 4}`),
+    })),
+  ],
+  'door-3': [
+    {
+      src: roomAsset('708', 'East.png'),
+      title: 'ជំហានទី ១៖ ចាប់ផ្តើមពីច្រកចូលខាងកើត',
+      text: 'ចាប់ផ្តើមពីច្រកចូលខាងកើត ហើយដើរតាមផ្លូវដែលបង្ហាញ។',
+    },
+    {
+      src: roomAsset('708', 'east_1.png'),
+      title: 'ជំហានទី ២៖ បន្តពីច្រកចូលខាងកើត',
+      text: 'បន្តដើរតាមច្រកផ្លូវនេះ រហូតដល់ចំណុចបន្ទាប់។',
+    },
+    {
+      src: roomAsset('708', 'go_thought.png'),
+      title: 'ជំហានទី ៣៖ ដើរឆ្លងកាត់ច្រកផ្លូវ',
+      text: 'ដើរឆ្លងកាត់តំបន់នេះ ហើយបន្តទៅរកជណ្តើរយន្ត។',
+    },
+    ...sharedRoom708Steps.map((step, index) => ({
+      ...step,
+      title: step.title.replace(`ជំហានទី ${index + 2}`, `ជំហានទី ${index + 4}`),
+    })),
+  ],
+}
+
+function makeRoom607Guides({ roomNumber, roomFolder, turnLabel, turnText }) {
+  const photoFor = (name) => roomAsset(roomFolder, name)
+  const sharedSteps = [
+    {
+      src: photoFor('elevator.jpg'),
+      title: 'ទៅដល់ជណ្តើរយន្ត',
+      text: 'បន្តដើរទៅកាន់ជណ្តើរយន្ត។ ប្រើរូបភាពនេះដើម្បីផ្ទៀងផ្ទាត់ថាអ្នកបានមកដល់ចំណុចត្រឹមត្រូវ។',
+    },
+    {
+      src: photoFor('choice_nunber.png'),
+      title: 'ជ្រើសរើសលេខ ៦',
+      text: `នៅក្នុងជណ្តើរយន្ត សូមជ្រើសរើសលេខ ៦ ដើម្បីទៅកាន់ ${roomNumber}។`,
+    },
+    {
+      src: photoFor('out_turn_left.png'),
+      title: 'ចេញពីជណ្តើរយន្ត ហើយបត់ឆ្វេង',
+      text: 'ពេលចេញពីជណ្តើរយន្ត សូមបត់ទៅខាងឆ្វេងតាមទិសដៅដែលបង្ហាញក្នុងរូបភាព។',
+    },
+    {
+      src: photoFor('choice_left_right.png'),
+      title: turnLabel,
+      text: turnText,
+    },
+    {
+      src: photoFor('done.jpg'),
+      title: `ទៅដល់ ${roomNumber}`,
+      text: `អ្នកបានទៅដល់ ${roomNumber} ហើយ។ សូមពិនិត្យស្លាកបន្ទប់មុនពេលចូល។`,
+    },
+  ]
+
+  const withStepNumbers = (steps) =>
+    steps.map((step, index) => ({
+      ...step,
+      title: `ជំហានទី ${index + 1}៖ ${step.title}`,
+    }))
+
+  return {
+    'door-1': withStepNumbers([
+      {
+        src: photoFor('South.png'),
+        title: 'ចាប់ផ្តើមពីច្រកចូលខាងត្បូង',
+        text: `ចាប់ផ្តើមពីច្រកចូលខាងត្បូង ហើយដើរទៅកាន់តំបន់ជណ្តើរយន្តសម្រាប់ ${roomNumber}។`,
+      },
+      ...sharedSteps,
+    ]),
+    'door-2': withStepNumbers([
+      {
+        src: photoFor('West.png'),
+        title: 'ចាប់ផ្តើមពីច្រកចូលខាងលិច',
+        text: 'ចាប់ផ្តើមពីច្រកចូលខាងលិច ហើយដើរតាមផ្លូវខាងមុខ។',
+      },
+      {
+        src: photoFor('west_1.png'),
+        title: 'បន្តពីច្រកចូលខាងលិច',
+        text: 'បន្តដើរតាមច្រកផ្លូវនេះ រហូតដល់ចំណុចបន្ទាប់។',
+      },
+      {
+        src: photoFor('go_thought.png'),
+        title: 'ដើរឆ្លងកាត់ច្រកផ្លូវ',
+        text: 'ដើរឆ្លងកាត់តំបន់នេះ ហើយបន្តទៅរកជណ្តើរយន្ត។',
+      },
+      ...sharedSteps,
+    ]),
+    'door-3': withStepNumbers([
+      {
+        src: photoFor('East.png'),
+        title: 'ចាប់ផ្តើមពីច្រកចូលខាងកើត',
+        text: 'ចាប់ផ្តើមពីច្រកចូលខាងកើត ហើយដើរតាមផ្លូវដែលបង្ហាញ។',
+      },
+      {
+        src: photoFor('east_1.png'),
+        title: 'បន្តពីច្រកចូលខាងកើត',
+        text: 'បន្តដើរតាមច្រកផ្លូវនេះ រហូតដល់ចំណុចបន្ទាប់។',
+      },
+      {
+        src: photoFor('go_thought.png'),
+        title: 'ដើរឆ្លងកាត់ច្រកផ្លូវ',
+        text: 'ដើរឆ្លងកាត់តំបន់នេះ ហើយបន្តទៅរកជណ្តើរយន្ត។',
+      },
+      ...sharedSteps,
+    ]),
+  }
+}
+
+export const fallbackGuidePictures = [
+  {
+    src: asset('photo_1_2026-07-06_15-00-07.jpg'),
+    title: 'ជំហានទី ១៖ ចាប់ផ្តើមពីច្រកចូល',
+    text: 'ចាប់ផ្តើមពីតំបន់ច្រកចូល។ ប្រើរូបភាពនេះជាចំណុចសម្គាល់ដំបូង មុនពេលដើរទៅកាន់បន្ទប់ប្រជុំ។',
+  },
+  {
+    src: asset('photo_2_2026-07-06_15-00-07.jpg'),
+    title: 'ជំហានទី ២៖ ដើរតាមច្រកផ្លូវ',
+    text: 'បន្តដើរតាមច្រកផ្លូវដែលបង្ហាញក្នុងរូបភាពនេះ។ ដើរត្រង់ទៅមុខ ហើយរកមើលចំណុចសម្គាល់បន្ទាប់។',
+  },
+  {
+    src: asset('photo_3_2026-07-06_15-00-07.jpg'),
+    title: 'ជំហានទី ៣៖ បន្តដើរត្រង់',
+    text: 'នៅចំណុចនេះ សូមបន្តដើរត្រង់។ រូបភាពនេះជួយបញ្ជាក់ថាអ្នកកំពុងដើរតាមផ្លូវត្រឹមត្រូវ។',
+  },
+  {
+    src: asset('photo_4_2026-07-06_15-00-07.jpg'),
+    title: 'ជំហានទី ៤៖ ពិនិត្យតំបន់បន្ទប់',
+    text: 'ពេលទៅដល់តំបន់នេះ សូមដើរយឺតៗ ហើយពិនិត្យស្លាកបន្ទប់ប្រជុំនៅជិតទ្វារ។',
+  },
+  {
+    src: asset('photo_5_2026-07-06_15-00-07.jpg'),
+    title: 'ជំហានទី ៥៖ ទៅជិតបន្ទប់ប្រជុំ',
+    text: 'ដើរទៅជិតផ្នែកបន្ទប់ប្រជុំ។ ប្រើរូបភាពនេះដើម្បីផ្ទៀងផ្ទាត់ច្រកផ្លូវ ឬតំបន់រង់ចាំចុងក្រោយ។',
+  },
+  {
+    src: asset('photo_6_2026-07-06_15-00-07.jpg'),
+    title: 'ជំហានទី ៦៖ ទៅដល់បន្ទប់របស់អ្នក',
+    text: 'អ្នកបានទៅដល់តំបន់បន្ទប់ប្រជុំហើយ។ សូមពិនិត្យឈ្មោះបន្ទប់ដែលអ្នកបានជ្រើសរើស មុនពេលចូល។',
+  },
+]
+
+export const rooms = [
+  {
+    id: 'room-a',
+    name: 'បន្ទប់ 708',
+    room: '708',
+    building: 'អគារភាតរភាព',
+    floor: 'ជាន់ទី ៧',
+    status: 'ទំនេរ',
+    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80',
+    color: '#167c80',
+  },
+  {
+    id: 'room-b',
+    name: 'បន្ទប់ 607A',
+    room: '607A',
+    building: 'អគារភាតរភាព',
+    floor: 'ជាន់ទី ៦',
+    status: 'ទំនេរ',
+    image: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=900&q=80',
+    color: '#4f78c7',
+  },
+  {
+    id: 'room-c',
+    name: 'បន្ទប់ 607B',
+    room: '607B',
+    building: 'អគារភាតរភាព',
+    floor: 'ជាន់ទី ៦',
+    status: 'ទំនេរ',
+    image: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=900&q=80',
+    color: '#6a6bbf',
+  },
+]
+
+export const doors = [
+  {
+    id: 'door-1',
+    name: 'ច្រកចូលខាងត្បូង',
+    hint: 'ច្រកចូលមុខ',
+    image: '/assets/Door/south.jpg',
+  },
+  {
+    id: 'door-2',
+    name: 'ច្រកចូលខាងលិច',
+    hint: 'ច្រកចូលលិច',
+    image: '/assets/Door/wast.jpg',
+  },
+  {
+    id: 'door-3',
+    name: 'ច្រកចូលខាងកើត',
+    hint: 'ច្រកចូលកើត',
+    image: '/assets/Door/east.jpg',
+  },
+]
+
+export const roomGuides = {
+  '708': room708Guides,
+  '607A': makeRoom607Guides({
+    roomNumber: 'បន្ទប់ 607A',
+    roomFolder: '607A',
+    turnLabel: 'ជ្រើសរើសបត់ឆ្វេងទៅបន្ទប់ 607A',
+    turnText: 'នៅចំណុចជ្រើសរើសផ្លូវ សូមបត់ទៅខាងឆ្វេង ដើម្បីទៅកាន់បន្ទប់ 607A។',
+  }),
+  '607B': makeRoom607Guides({
+    roomNumber: 'បន្ទប់ 607B',
+    roomFolder: '607B',
+    turnLabel: 'ជ្រើសរើសបត់ស្តាំទៅបន្ទប់ 607B',
+    turnText: 'នៅចំណុចជ្រើសរើសផ្លូវ សូមបត់ទៅខាងស្តាំ ដើម្បីទៅកាន់បន្ទប់ 607B។',
+  }),
+}
