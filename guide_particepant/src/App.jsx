@@ -1,6 +1,193 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 
 const photo = (name) => `/assets/${name}`
+const room708Photo = (name) => `/assets/708/${name}`
+const room607APhoto = (name) => `/assets/607A/${name}`
+const room607BPhoto = (name) => `/assets/607B/${name}`
+
+const sharedRoom708Steps = [
+  {
+    src: room708Photo('elevator.jpg'),
+    title: 'ជំហានទី ២៖ ទៅដល់ជណ្តើរយន្ត',
+    text: 'បន្តដើរទៅកាន់ជណ្តើរយន្ត។ ប្រើរូបភាពនេះដើម្បីផ្ទៀងផ្ទាត់ថាអ្នកបានមកដល់ចំណុចត្រឹមត្រូវ។',
+  },
+  {
+    src: room708Photo('choice_nunber.png'),
+    title: 'ជំហានទី ៣៖ ជ្រើសរើសជាន់ទី ៧',
+    text: 'នៅក្នុងជណ្តើរយន្ត សូមជ្រើសរើសជាន់ទី ៧ ដើម្បីទៅកាន់បន្ទប់ 708។',
+  },
+  {
+    src: room708Photo('out_turn_left.png'),
+    title: 'ជំហានទី ៤៖ ចេញពីជណ្តើរយន្ត ហើយបត់ឆ្វេង',
+    text: 'ពេលចេញពីជណ្តើរយន្ត សូមបត់ទៅខាងឆ្វេងតាមទិសដៅដែលបង្ហាញក្នុងរូបភាព។',
+  },
+  {
+    src: room708Photo('turn_right_for_room708.png'),
+    title: 'ជំហានទី ៥៖ បត់ស្តាំទៅបន្ទប់ 708',
+    text: 'បន្តដើរតាមផ្លូវ ហើយបត់ស្តាំនៅចំណុចនេះ ដើម្បីទៅកាន់បន្ទប់ 708។',
+  },
+  {
+    src: room708Photo('done.jpg'),
+    title: 'ជំហានទី ៦៖ ទៅដល់បន្ទប់ 708',
+    text: 'អ្នកបានទៅដល់បន្ទប់ 708 ហើយ។ សូមពិនិត្យស្លាកបន្ទប់មុនពេលចូល។',
+  },
+]
+
+const room708Guides = {
+  'door-1': [
+    {
+      src: room708Photo('South.png'),
+      title: 'ជំហានទី ១៖ ចាប់ផ្តើមពីច្រកចូលខាងត្បូង',
+      text: 'ចាប់ផ្តើមពីច្រកចូលខាងត្បូង ហើយដើរទៅកាន់តំបន់ជណ្តើរយន្ត។',
+    },
+    ...sharedRoom708Steps,
+  ],
+  'door-2': [
+    {
+      src: room708Photo('West.png'),
+      title: 'ជំហានទី ១៖ ចាប់ផ្តើមពីច្រកចូលខាងលិច',
+      text: 'ចាប់ផ្តើមពីច្រកចូលខាងលិច ហើយដើរតាមផ្លូវខាងមុខ។',
+    },
+    {
+      src: room708Photo('west_1.png'),
+      title: 'ជំហានទី ២៖ បន្តពីច្រកចូលខាងលិច',
+      text: 'បន្តដើរតាមច្រកផ្លូវនេះ រហូតដល់ចំណុចបន្ទាប់។',
+    },
+    {
+      src: room708Photo('go_thought.png'),
+      title: 'ជំហានទី ៣៖ ដើរឆ្លងកាត់ច្រកផ្លូវ',
+      text: 'ដើរឆ្លងកាត់តំបន់នេះ ហើយបន្តទៅរកជណ្តើរយន្ត។',
+    },
+    ...sharedRoom708Steps.map((step, index) => ({
+      ...step,
+      title: step.title.replace(`ជំហានទី ${index + 2}`, `ជំហានទី ${index + 4}`),
+    })),
+  ],
+  'door-3': [
+    {
+      src: room708Photo('East.png'),
+      title: 'ជំហានទី ១៖ ចាប់ផ្តើមពីច្រកចូលខាងកើត',
+      text: 'ចាប់ផ្តើមពីច្រកចូលខាងកើត ហើយដើរតាមផ្លូវដែលបង្ហាញ។',
+    },
+    {
+      src: room708Photo('east_1.png'),
+      title: 'ជំហានទី ២៖ បន្តពីច្រកចូលខាងកើត',
+      text: 'បន្តដើរតាមច្រកផ្លូវនេះ រហូតដល់ចំណុចបន្ទាប់។',
+    },
+    {
+      src: room708Photo('go_thought.png'),
+      title: 'ជំហានទី ៣៖ ដើរឆ្លងកាត់ច្រកផ្លូវ',
+      text: 'ដើរឆ្លងកាត់តំបន់នេះ ហើយបន្តទៅរកជណ្តើរយន្ត។',
+    },
+    ...sharedRoom708Steps.map((step, index) => ({
+      ...step,
+      title: step.title.replace(`ជំហានទី ${index + 2}`, `ជំហានទី ${index + 4}`),
+    })),
+  ],
+}
+
+function makeRoom607Guides({ roomNumber, photoFor, turnLabel, turnText }) {
+  const sharedSteps = [
+    {
+      src: photoFor('elevator.jpg'),
+      title: 'ទៅដល់ជណ្តើរយន្ត',
+      text: 'បន្តដើរទៅកាន់ជណ្តើរយន្ត។ ប្រើរូបភាពនេះដើម្បីផ្ទៀងផ្ទាត់ថាអ្នកបានមកដល់ចំណុចត្រឹមត្រូវ។',
+    },
+    {
+      src: photoFor('choice_nunber.png'),
+      title: 'ជ្រើសរើសលេខ ៦',
+      text: `នៅក្នុងជណ្តើរយន្ត សូមជ្រើសរើសលេខ ៦ ដើម្បីទៅកាន់ ${roomNumber}។`,
+    },
+    {
+      src: photoFor('out_turn_left.png'),
+      title: 'ចេញពីជណ្តើរយន្ត ហើយបត់ឆ្វេង',
+      text: 'ពេលចេញពីជណ្តើរយន្ត សូមបត់ទៅខាងឆ្វេងតាមទិសដៅដែលបង្ហាញក្នុងរូបភាព។',
+    },
+    {
+      src: photoFor('choice_left_right.png'),
+      title: turnLabel,
+      text: turnText,
+    },
+    {
+      src: photoFor('done.jpg'),
+      title: `ទៅដល់ ${roomNumber}`,
+      text: `អ្នកបានទៅដល់ ${roomNumber} ហើយ។ សូមពិនិត្យស្លាកបន្ទប់មុនពេលចូល។`,
+    },
+  ]
+
+  const withStepNumbers = (steps) =>
+    steps.map((step, index) => ({
+      ...step,
+      title: `ជំហានទី ${index + 1}៖ ${step.title}`,
+    }))
+
+  return {
+    'door-1': withStepNumbers([
+      {
+        src: photoFor('South.png'),
+        title: 'ចាប់ផ្តើមពីច្រកចូលខាងត្បូង',
+        text: `ចាប់ផ្តើមពីច្រកចូលខាងត្បូង ហើយដើរទៅកាន់តំបន់ជណ្តើរយន្តសម្រាប់ ${roomNumber}។`,
+      },
+      ...sharedSteps,
+    ]),
+    'door-2': withStepNumbers([
+      {
+        src: photoFor('West.png'),
+        title: 'ចាប់ផ្តើមពីច្រកចូលខាងលិច',
+        text: 'ចាប់ផ្តើមពីច្រកចូលខាងលិច ហើយដើរតាមផ្លូវខាងមុខ។',
+      },
+      {
+        src: photoFor('west_1.png'),
+        title: 'បន្តពីច្រកចូលខាងលិច',
+        text: 'បន្តដើរតាមច្រកផ្លូវនេះ រហូតដល់ចំណុចបន្ទាប់។',
+      },
+      {
+        src: photoFor('go_thought.png'),
+        title: 'ដើរឆ្លងកាត់ច្រកផ្លូវ',
+        text: 'ដើរឆ្លងកាត់តំបន់នេះ ហើយបន្តទៅរកជណ្តើរយន្ត។',
+      },
+      ...sharedSteps,
+    ]),
+    'door-3': withStepNumbers([
+      {
+        src: photoFor('East.png'),
+        title: 'ចាប់ផ្តើមពីច្រកចូលខាងកើត',
+        text: 'ចាប់ផ្តើមពីច្រកចូលខាងកើត ហើយដើរតាមផ្លូវដែលបង្ហាញ។',
+      },
+      {
+        src: photoFor('east_1.png'),
+        title: 'បន្តពីច្រកចូលខាងកើត',
+        text: 'បន្តដើរតាមច្រកផ្លូវនេះ រហូតដល់ចំណុចបន្ទាប់។',
+      },
+      {
+        src: photoFor('go_thought.png'),
+        title: 'ដើរឆ្លងកាត់ច្រកផ្លូវ',
+        text: 'ដើរឆ្លងកាត់តំបន់នេះ ហើយបន្តទៅរកជណ្តើរយន្ត។',
+      },
+      ...sharedSteps,
+    ]),
+  }
+}
+
+const room607AGuides = makeRoom607Guides({
+  roomNumber: 'បន្ទប់ 607A',
+  photoFor: room607APhoto,
+  turnLabel: 'ជ្រើសរើសបត់ឆ្វេងទៅបន្ទប់ 607A',
+  turnText: 'នៅចំណុចជ្រើសរើសផ្លូវ សូមបត់ទៅខាងឆ្វេង ដើម្បីទៅកាន់បន្ទប់ 607A។',
+})
+
+const room607BGuides = makeRoom607Guides({
+  roomNumber: 'បន្ទប់ 607B',
+  photoFor: room607BPhoto,
+  turnLabel: 'ជ្រើសរើសបត់ស្តាំទៅបន្ទប់ 607B',
+  turnText: 'នៅចំណុចជ្រើសរើសផ្លូវ សូមបត់ទៅខាងស្តាំ ដើម្បីទៅកាន់បន្ទប់ 607B។',
+})
+
+const roomGuides = {
+  '708': room708Guides,
+  '607A': room607AGuides,
+  '607B': room607BGuides,
+}
 
 const guidePictures = [
   {
@@ -39,7 +226,11 @@ const rooms = [
   {
     id: 'room-a',
     name: 'បន្ទប់ 708',
-    floor: 'ជាន់ទី ១',
+    room: '708',
+    building: 'អគារភាតរភាព',
+    floor: 'ជាន់ទី ៧',
+    status: 'ទំនេរ',
+    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80',
     color: '#167c80',
     map: {
       title: 'ផែនទីទៅបន្ទប់ 708',
@@ -50,7 +241,11 @@ const rooms = [
   {
     id: 'room-b',
     name: 'បន្ទប់ 607A',
-    floor: 'ជាន់ទី ១',
+    room: '607A',
+    building: 'អគារភាតរភាព',
+    floor: 'ជាន់ទី ៦',
+    status: 'ទំនេរ',
+    image: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=900&q=80',
     color: '#4f78c7',
     map: {
       title: 'ផែនទីទៅបន្ទប់ 607A',
@@ -61,7 +256,11 @@ const rooms = [
   {
     id: 'room-c',
     name: 'បន្ទប់ 607B',
-    floor: 'ជាន់ទី ២',
+    room: '607B',
+    building: 'អគារភាតរភាព',
+    floor: 'ជាន់ទី ៦',
+    status: 'ទំនេរ',
+    image: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=900&q=80',
     color: '#6a6bbf',
     map: {
       title: 'ផែនទីទៅបន្ទប់ 607B',
@@ -74,99 +273,30 @@ const rooms = [
 const doors = [
   {
     id: 'door-1',
-    name: 'ទ្វារ ១',
-    hint: 'ច្រកចូលខាងមុខ',
+    name: 'ច្រកចូលខាងត្បូង',
+    hint: 'ច្រកចូលមុខ',
+    image: '/assets/Door/south.jpg',
   },
   {
     id: 'door-2',
-    name: 'ទ្វារ ២',
-    hint: 'ច្រកកណ្តាល',
+    name: 'ច្រកចូលខាងលិច',
+    hint: 'ច្រកចូលលិច',
+    image: '/assets/Door/wast.jpg',
   },
   {
     id: 'door-3',
-    name: 'ទ្វារ ៣',
-    hint: 'ច្រកជិតជណ្តើរយន្ត',
+    name: 'ច្រកចូលខាងកើត',
+    hint: 'ច្រកចូលកើត',
+    image: '/assets/Door/east.jpg',
   },
 ]
-
-function CombinedRoomMap() {
-  return (
-    <svg
-      className="room-map"
-      viewBox="0 0 720 520"
-      role="img"
-      aria-label="ផែនទីសម្រាប់បន្ទប់ 708 បន្ទប់ 607A និងបន្ទប់ 607B"
-    >
-      <defs>
-        <linearGradient id="combined-map-bg" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stopColor="#f8fbff" />
-          <stop offset="100%" stopColor="#edf4f8" />
-        </linearGradient>
-        <filter id="map-shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="8" stdDeviation="10" floodColor="#1f3140" floodOpacity="0.12" />
-        </filter>
-      </defs>
-      <rect width="720" height="520" rx="28" fill="url(#combined-map-bg)" />
-      <text x="36" y="66" fontSize="12" fill="#607080">ដើរតាមពណ៌ផ្លូវរបស់បន្ទប់ដែលអ្នកជ្រើសរើស។</text>
-
-      <g transform="translate(36 92)" filter="url(#map-shadow)">
-        <rect x="0" y="0" width="648" height="348" rx="24" fill="#fff" stroke="#d6e1e8" strokeWidth="3" />
-        <rect x="28" y="32" width="120" height="86" rx="16" fill="#fef0ee" stroke="#e8aaa1" strokeWidth="3" />
-        <text x="88" y="70" textAnchor="middle" fontSize="15" fontWeight="900" fill="#9b3f34">ទទួលភ្ញៀវ</text>
-        <text x="88" y="94" textAnchor="middle" fontSize="11" fill="#9b3f34">ចាប់ផ្តើម</text>
-
-        <rect x="28" y="220" width="120" height="88" rx="16" fill="#ecfafa" stroke="#a9ced0" strokeWidth="3" />
-        <text x="88" y="257" textAnchor="middle" fontSize="15" fontWeight="900" fill="#0c5e66">ឡប់ប៊ី</text>
-        <text x="88" y="281" textAnchor="middle" fontSize="11" fill="#0c5e66">ច្រកចូល</text>
-
-        <rect x="32" y="136" width="108" height="62" rx="15" fill="#fff7e6" stroke="#e6c370" strokeWidth="3" />
-        <text x="86" y="174" textAnchor="middle" fontSize="13" fontWeight="900" fill="#7d5a0b">ជណ្តើរយន្ត</text>
-
-        <rect x="190" y="50" width="86" height="250" rx="18" fill="#f8fafc" stroke="#dce4ea" strokeWidth="3" />
-        <text x="233" y="181" textAnchor="middle" fontSize="12" fontWeight="800" fill="#607080" transform="rotate(-90 233 181)">ច្រកផ្លូវសំខាន់</text>
-
-        <rect x="330" y="32" width="120" height="88" rx="18" fill="#ecfafa" stroke="#167c80" strokeWidth="4" />
-        <text x="390" y="72" textAnchor="middle" fontSize="17" fontWeight="900" fill="#0c5e66">708</text>
-        <text x="390" y="97" textAnchor="middle" fontSize="11" fill="#0c5e66">ជាន់ទី ១</text>
-
-        <rect x="486" y="132" width="120" height="88" rx="18" fill="#eef4ff" stroke="#4f78c7" strokeWidth="4" />
-        <text x="546" y="172" textAnchor="middle" fontSize="17" fontWeight="900" fill="#2a559c">607A</text>
-        <text x="546" y="197" textAnchor="middle" fontSize="11" fill="#2a559c">ជាន់ទី ១</text>
-
-        <rect x="330" y="232" width="120" height="88" rx="18" fill="#f3f1ff" stroke="#6a6bbf" strokeWidth="4" />
-        <text x="390" y="272" textAnchor="middle" fontSize="17" fontWeight="900" fill="#4e4fa0">607B</text>
-        <text x="390" y="297" textAnchor="middle" fontSize="11" fill="#4e4fa0">ជាន់ទី ២</text>
-
-        <path className="route-line route-a" d="M88 264 L233 264 L233 76 L330 76" fill="none" stroke="#167c80" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" opacity="0.92" />
-        <path className="route-dash" d="M88 264 L233 264 L233 76 L330 76" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="1 18" />
-
-        <path className="route-line route-b" d="M88 264 L233 264 L233 176 L486 176" fill="none" stroke="#4f78c7" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" opacity="0.88" />
-        <path className="route-dash" d="M88 264 L233 264 L233 176 L486 176" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="1 18" />
-
-        <path className="route-line route-c" d="M88 264 L233 264 L330 276" fill="none" stroke="#6a6bbf" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" opacity="0.88" />
-        <path className="route-dash" d="M88 264 L233 264 L330 276" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="1 18" />
-
-        <circle cx="88" cy="264" r="16" fill="#18222d" />
-        <text x="88" y="270" textAnchor="middle" fontSize="15" fontWeight="900" fill="#fff">ច</text>
-      </g>
-
-      <g transform="translate(36 466)">
-        <circle cx="8" cy="0" r="6" fill="#167c80" />
-        <text x="21" y="5" fontSize="12" fontWeight="800" fill="#18222d">708</text>
-        <circle cx="100" cy="0" r="6" fill="#4f78c7" />
-        <text x="113" y="5" fontSize="12" fontWeight="800" fill="#18222d">607A</text>
-        <circle cx="192" cy="0" r="6" fill="#6a6bbf" />
-        <text x="205" y="5" fontSize="12" fontWeight="800" fill="#18222d">607B</text>
-      </g>
-    </svg>
-  )
-}
 
 function App() {
   const [pendingRoomId, setPendingRoomId] = useState(null)
   const [selectedRoomId, setSelectedRoomId] = useState(null)
   const [selectedDoorId, setSelectedDoorId] = useState(null)
   const [selectedPictureIndex, setSelectedPictureIndex] = useState(0)
+  const swipeStartX = useRef(null)
 
   const pendingRoom = useMemo(
     () => rooms.find((room) => room.id === pendingRoomId),
@@ -180,7 +310,14 @@ function App() {
     () => doors.find((door) => door.id === selectedDoorId),
     [selectedDoorId],
   )
-  const selectedPicture = guidePictures[selectedPictureIndex]
+  const activeGuidePictures = useMemo(() => {
+    if (selectedRoom?.room && selectedDoorId) {
+      return roomGuides[selectedRoom.room]?.[selectedDoorId] || guidePictures
+    }
+
+    return guidePictures
+  }, [selectedDoorId, selectedRoom])
+  const selectedPicture = activeGuidePictures[selectedPictureIndex]
 
   function selectRoom(roomId) {
     setPendingRoomId(roomId)
@@ -198,9 +335,28 @@ function App() {
 
   function swapPicture(direction) {
     setSelectedPictureIndex((current) => {
-      const total = guidePictures.length
+      const total = activeGuidePictures.length
       return (current + direction + total) % total
     })
+  }
+
+  function startSwipe(event) {
+    swipeStartX.current = event.clientX
+  }
+
+  function finishSwipe(event) {
+    if (swipeStartX.current === null) {
+      return
+    }
+
+    const distance = event.clientX - swipeStartX.current
+    swipeStartX.current = null
+
+    if (Math.abs(distance) < 45) {
+      return
+    }
+
+    swapPicture(distance < 0 ? 1 : -1)
   }
 
   if (pendingRoom) {
@@ -227,9 +383,7 @@ function App() {
                 onClick={() => selectDoor(door.id)}
                 style={{ '--room-color': pendingRoom.color }}
               >
-                <span className="door-icon" aria-hidden="true">
-                  <span />
-                </span>
+                <img className="door-image" src={door.image} alt={`រូបភាព ${door.name}`} />
                 <strong>{door.name}</strong>
                 <small>{door.hint}</small>
               </button>
@@ -253,14 +407,21 @@ function App() {
               <div className="picture-title">
                 <p>{selectedRoom.name}</p>
                 {selectedDoor && <small>{selectedDoor.name}</small>}
-                <span>រូបភាពទី {selectedPictureIndex + 1} / {guidePictures.length}</span>
+                <span>រូបភាពទី {selectedPictureIndex + 1} / {activeGuidePictures.length}</span>
               </div>
               <button className="round-button" type="button" aria-label="រូបភាពបន្ទាប់" onClick={() => swapPicture(1)}>
                 &#8594;
               </button>
             </div>
 
-            <div className="photo-frame">
+            <div
+              className="photo-frame"
+              onPointerDown={startSwipe}
+              onPointerLeave={() => {
+                swipeStartX.current = null
+              }}
+              onPointerUp={finishSwipe}
+            >
               <img src={selectedPicture.src} alt={`រូបភាព ${selectedPicture.title}`} />
             </div>
 
@@ -269,7 +430,7 @@ function App() {
               <h2>{selectedPicture.title}</h2>
               <p>{selectedPicture.text}</p>
               <div className="step-dots" aria-label="ទីតាំងរូបភាពណែនាំ">
-                {guidePictures.map((picture, index) => (
+                {activeGuidePictures.map((picture, index) => (
                   <button
                     className={index === selectedPictureIndex ? 'is-active' : ''}
                     key={picture.src}
@@ -309,7 +470,7 @@ function App() {
           <div className="selected-pill">ជំហានទី ១</div>
         </header>
 
-        <section className="room-section" aria-label="ជ្រើសរើសបន្ទប់ប្រជុំ">
+        <section className="room-selection-section room-section" aria-label="ជ្រើសរើសបន្ទប់ប្រជុំ">
           {rooms.map((room) => (
             <button
               className="room-card"
@@ -318,18 +479,17 @@ function App() {
               onClick={() => selectRoom(room.id)}
               style={{ '--room-color': room.color }}
             >
+              <img className="room-preview" src={room.image} alt={`រូបភាព ${room.name}`} />
               <span className="room-card-heading">
-                <strong>{room.name}</strong>
-                <small>{room.floor}</small>
+                <span>
+                  <strong>{room.name}</strong>
+                  <small>{room.building}</small>
+                </span>
+                <em>{room.floor}</em>
               </span>
+              <span className="room-status">{room.status}</span>
             </button>
           ))}
-        </section>
-
-        <section className="map-panel">
-          <section className="combined-map-panel" aria-label="ផែនទីបង្ហាញផ្លូវ">
-            <CombinedRoomMap />
-          </section>
         </section>
       </section>
     </main>
