@@ -388,9 +388,9 @@ function MeetingDetail({ meetingId }) {
   )
 }
 
-export default function App() {
+export default function App({ skipAccess = false }) {
   const route = useHashRoute()
-  const [authorized, setAuthorized] = useState(false)
+  const [authorized, setAuthorized] = useState(skipAccess)
   const docsMatch = route.match(/^\/docs\/([^/]+)\/?([^/]*)/)
   const participantsMatch = route.match(/^\/participants\/([^/]+)/)
   const meetingMatch = route.match(/^\/meetings\/([^/]+)/)
