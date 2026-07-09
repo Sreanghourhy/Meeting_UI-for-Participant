@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 
 const photo = (name) => `/assets/${name}`
 
@@ -83,29 +83,47 @@ const rooms = [
 const doors = [
   {
     id: 'door-1',
-    name: 'ច្រកចុូលខាងត្បូង',
+    name: 'ច្រកចូលខាងត្បូង',
     hint: 'ច្រកចូលខាងមុខ',
     image: '/assets/Door/wast.jpg',
   },
   {
     id: 'door-2',
-    name: 'ច្រកចុូលខាងជើង',
+    name: 'ច្រកចូលខាងជើង',
     hint: 'ច្រកកណ្តាល',
     image: '/assets/Door/south.jpg',
   },
   {
     id: 'door-3',
-    name: 'ច្រកចុូលខាងកើត',
+    name: 'ច្រកចូលខាងកើត',
     hint: 'ច្រកជិតជណ្តើរយន្ត',
     image: '/assets/Door/east.jpg',
   },
 ]
 
-function App() {
+function App({ onStepChange }) {
   const [pendingRoomId, setPendingRoomId] = useState(null)
   const [selectedRoomId, setSelectedRoomId] = useState(null)
   const [selectedDoorId, setSelectedDoorId] = useState(null)
   const [selectedPictureIndex, setSelectedPictureIndex] = useState(0)
+
+  useEffect(() => {
+    if (onStepChange) {
+      if (selectedRoomId) {
+        onStepChange('details', () => {
+          setPendingRoomId(selectedRoomId)
+          setSelectedRoomId(null)
+          setSelectedDoorId(null)
+        })
+      } else if (pendingRoomId) {
+        onStepChange('doors', () => {
+          setPendingRoomId(null)
+        })
+      } else {
+        onStepChange('rooms', null)
+      }
+    }
+  }, [pendingRoomId, selectedRoomId, onStepChange])
 
   const pendingRoom = useMemo(
     () => rooms.find((room) => room.id === pendingRoomId),
@@ -159,9 +177,6 @@ function App() {
               <h1>ជ្រើសរើសទ្វារ</h1>
               <p className="header-copy">អ្នកបានជ្រើស {pendingRoom.name}។ សូមជ្រើសទ្វារដែលអ្នកចូលមក។</p>
             </div>
-            <button className="back-link back-link-inline" type="button" onClick={() => setPendingRoomId(null)}>
-              ត្រឡប់ក្រោយ
-            </button>
           </header>
 
           <section className="door-section" aria-label="ជ្រើសរើសទ្វារ">
@@ -224,17 +239,6 @@ function App() {
                 ))}
               </div>
             </div>
-
-            <button
-              className="back-link"
-              type="button"
-              onClick={() => {
-                setSelectedRoomId(null)
-                setSelectedDoorId(null)
-              }}
-            >
-              ជ្រើសរើសបន្ទប់ផ្សេង
-            </button>
           </section>
         </section>
       </main>

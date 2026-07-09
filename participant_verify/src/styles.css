@@ -187,27 +187,36 @@ h1 {
   margin-bottom: 8px;
 }
 
-.participant-grid {
+.participant-page .participant-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 22px;
 }
 
-.participant-card {
+.participant-page .participant-card {
+  display: block;
+  grid-template-columns: none;
+  gap: 0;
+  padding: 0;
   overflow: hidden;
+  background: var(--color-card);
+  border: 1px solid rgba(215, 225, 234, 0.86);
   border-color: rgba(215, 225, 234, 0.86);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 46px rgba(16, 32, 51, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.participant-card:hover {
+.participant-page .participant-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 24px 48px rgba(16, 32, 51, 0.13);
 }
 
-.participant-photo-button {
+.participant-page .participant-photo-button {
   position: relative;
   display: block;
   width: 100%;
+  min-height: 220px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -230,7 +239,7 @@ h1 {
   display: none;
 }
 
-.participant-photo-button::after {
+.participant-page .participant-photo-button::after {
   content: "មើលព័ត៌មាន";
   position: absolute;
   z-index: 3;
@@ -248,27 +257,27 @@ h1 {
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.participant-photo-button:hover::after {
+.participant-page .participant-photo-button:hover::after {
   opacity: 1;
   transform: translateY(0);
 }
 
-.participant-photo-button img {
+.participant-page .participant-photo-button img {
   position: relative;
   z-index: 1;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  height: 220px;
   display: block;
   object-fit: cover;
   background: #e5e7eb;
   transition: transform 0.28s ease;
 }
 
-.participant-photo-button:hover img {
+.participant-page .participant-photo-button:hover img {
   transform: scale(1.035);
 }
 
-.participant-photo-button:focus-visible {
+.participant-page .participant-photo-button:focus-visible {
   outline: 3px solid rgba(29, 78, 216, 0.32);
   outline-offset: -3px;
 }
@@ -295,29 +304,31 @@ h1 {
   top: 12px;
 }
 
-.participant-info {
-  padding: 18px 18px 20px;
+.participant-page .participant-info {
+  padding: 20px 20px 22px;
 }
 
-.participant-title-row {
+.participant-page .participant-title-row {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
 }
 
-.participant-info h2 {
+.participant-page .participant-info h2 {
+  font-family: var(--font-body);
+  font-weight: 800;
   margin-bottom: 6px;
-  font-size: 19px;
+  font-size: 18px;
   line-height: 1.45;
 }
 
-.participant-info p {
+.participant-page .participant-info p {
   margin-bottom: 12px;
   color: var(--color-muted);
 }
 
-.participant-info span {
+.participant-page .participant-info span {
   display: inline-flex;
   max-width: 100%;
   padding: 6px 10px;

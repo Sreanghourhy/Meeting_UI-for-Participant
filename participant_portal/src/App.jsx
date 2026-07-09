@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import AccessCodePage from './components/AccessCodePage.jsx'
 import PortalPage from './components/PortalPage.jsx'
@@ -58,6 +58,10 @@ function EmbeddedPortal({
   onBack,
   onCheckedParticipantIdsChange,
 }) {
+  const [hashRoute, setHashRoute] = useState(window.location.hash.replace(/^#/, '') || '/')
+  const [guideState, setGuideState] = useState({ step: 'rooms' })
+  const [guideBackFn, setGuideBackFn] = useState(null)
+
   const titles = {
     'meeting-viewer': 'មើលព័ត៌មានកិច្ចប្រជុំ',
     'viewer-calendar': 'ប្រតិទិនកិច្ចប្រជុំ',
@@ -66,12 +70,38 @@ function EmbeddedPortal({
     attendance: 'ចុះវត្តមានអ្នកចូលរួម',
     guide: 'មគ្គុទេសក៍ទីតាំង',
   }
+  const isCalendarMeetingDetail = activePortal === 'viewer-calendar' && /^\/meetings\/[^/]+/.test(hashRoute)
+
+  useEffect(() => {
+    const onHashChange = () => setHashRoute(window.location.hash.replace(/^#/, '') || '/')
+    onHashChange()
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  function backToCalendar() {
+    window.location.hash = '/calendar'
+  }
 
   return (
     <div className="embedded-portal">
       <div className="embedded-toolbar">
-        <button className="btn btn-secondary" type="button" onClick={onBack}>ត្រឡប់ទៅផ្ទាំងសេវាកម្ម</button>
-        <span>{titles[activePortal]}</span>
+        {isCalendarMeetingDetail ? (
+          <button className="btn btn-secondary" type="button" onClick={backToCalendar}>ត្រឡប់ទៅប្រតិទិន</button>
+        ) : activePortal === 'guide' && guideState.step === 'doors' ? (
+          <button className="btn btn-secondary" type="button" onClick={() => guideBackFn && guideBackFn()}>
+            ត្រឡប់ក្រោយ
+          </button>
+        ) : activePortal === 'guide' && guideState.step === 'details' ? (
+          <button className="btn btn-secondary" type="button" onClick={() => guideBackFn && guideBackFn()}>
+            ត្រឡប់ក្រោយ ជ្រើសរើសទ្វារ
+          </button>
+        ) : (
+          <>
+            <button className="btn btn-secondary" type="button" onClick={onBack}>ត្រឡប់ទៅផ្ទាំងសេវាកម្ម</button>
+            <span>{titles[activePortal]}</span>
+          </>
+        )}
       </div>
       <Suspense fallback={<div className="embedded-loading card">កំពុងបើក...</div>}>
         {activePortal === 'meeting-viewer' ? <ViewerApp skipAccess /> : null}
@@ -85,7 +115,14 @@ function EmbeddedPortal({
             onCheckedParticipantIdsChange={onCheckedParticipantIdsChange}
           />
         ) : null}
-        {activePortal === 'guide' ? <GuideParticipantApp /> : null}
+        {activePortal === 'guide' ? (
+          <GuideParticipantApp
+            onStepChange={(step, backFn) => {
+              setGuideState({ step })
+              setGuideBackFn(() => backFn)
+            }}
+          />
+        ) : null}
       </Suspense>
     </div>
   )
@@ -96,6 +133,13 @@ export default function App() {
   const [accessCode, setAccessCode] = useState('')
   const [activePortal, setActivePortal] = useState('')
   const [checkedParticipantIds, setCheckedParticipantIds] = useState([])
+
+  function openPortal(portalId) {
+    if (portalId === 'viewer-calendar') {
+      window.location.hash = '/calendar'
+    }
+    setActivePortal(portalId)
+  }
 
   if (!hasAccess) {
     return <AccessCodePage onSuccess={(code) => {
@@ -116,5 +160,5 @@ export default function App() {
     )
   }
 
-  return <PortalPage onOpenPortal={setActivePortal} />
+  return <PortalPage onOpenPortal={openPortal} />
 }
