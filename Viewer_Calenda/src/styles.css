@@ -1,6 +1,6 @@
 :root {
   --font-heading: "Moul", serif;
-  --font-body: "Siemreap", "Noto Sans Khmer", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Tinos", "Siemreap", "Noto Sans Khmer", "Segoe UI", system-ui, sans-serif;
   --color-primary: #1d4ed8;
   --color-primary-hover: #4a8bc4;
   --color-primary-light: #e8f4fc;
@@ -26,6 +26,40 @@
   --radius-lg: 8px;
   --transition: 0.2s ease;
   --layout-transition: 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.moul-regular {
+  font-family: "Moul", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.siemreap-regular {
+  font-family: "Siemreap", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.tinos-regular {
+  font-family: "Tinos", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.tinos-bold {
+  font-family: "Tinos", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.tinos-regular-italic {
+  font-family: "Tinos", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.tinos-bold-italic {
+  font-family: "Tinos", serif;
+  font-weight: 700;
+  font-style: italic;
 }
 
 *,
@@ -769,11 +803,16 @@ button {
 
 .btn-secondary {
   background: white;
-  color: var(--color-text);
-  border-color: var(--color-border);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
-.btn-secondary:hover,
+.btn-secondary:hover {
+  background: rgba(29, 78, 216, 0.04);
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-hover);
+}
+
 .btn-ghost:hover {
   background: var(--color-bg);
 }

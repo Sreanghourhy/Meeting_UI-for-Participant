@@ -52,8 +52,8 @@ function LogMeetingDetail() {
           <span>ឈ្មោះ</span>
           <span>តួនាទី</span>
           <span>មធ្យោបាយ</span>
-          <span>ស្ថានភាពផ្ញើ</span>
-          <span>ស្ថានភាពមើល</span>
+          <span className="text-center">ស្ថានភាពផ្ញើ</span>
+          <span className="text-center">ស្ថានភាពមើល</span>
         </div>
 
         {meeting.participants.map((participant) => {

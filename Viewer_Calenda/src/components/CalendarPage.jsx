@@ -99,7 +99,7 @@ function CalendarPanelList({ title, meetings, selectedMeetingId, onSelectMeeting
             <strong>{getCalendarPreviewTitle(item)}</strong>
             <em>{formatTimeRange(item.startTime, item.endTime)}</em>
           </button>
-        )) : <div className="empty-state compact">No meetings in this list.</div>}
+        )) : <div className="empty-state compact">មិនមានកិច្ចប្រជុំក្នុងបញ្ជីនេះទេ។</div>}
       </div>
     </div>
   )
@@ -129,7 +129,7 @@ function CalendarMeetingPreview({ meeting, meetings, onSelectMeeting }) {
           </div>
 
           <div className="calendar-preview-attendees">
-            <span className="calendar-preview-label">ATTENDEES</span>
+            <span className="calendar-preview-label">អ្នកចូលរួម</span>
             <div className="calendar-attendee-list">
               {attendees.map((attendee) => (
                 <div key={attendee.id} className="calendar-attendee-row">
@@ -141,11 +141,11 @@ function CalendarMeetingPreview({ meeting, meetings, onSelectMeeting }) {
           </div>
 
           <button className="btn btn-primary calendar-view-detail" type="button" onClick={() => goTo(`/meetings/${meeting.id}`)}>
-            View Detail
+            មើលព័ត៌មានលម្អិត
           </button>
         </article>
       ) : (
-        <div className="calendar-preview-card empty-state compact">Select a meeting date to view details.</div>
+        <div className="calendar-preview-card empty-state compact">ជ្រើសរើសកាលបរិច្ឆេទកិច្ចប្រជុំ ដើម្បីមើលព័ត៌មានលម្អិត។</div>
       )}
 
       <section className="calendar-panel-section">
@@ -157,7 +157,7 @@ function CalendarMeetingPreview({ meeting, meetings, onSelectMeeting }) {
             aria-selected={activeTimeline === 'upcoming'}
             onClick={() => setActiveTimeline('upcoming')}
           >
-            Upcoming
+            ខាងមុខ
           </button>
           <button
             className={`calendar-timeline-tab ${activeTimeline === 'previous' ? 'active' : ''}`}
@@ -166,7 +166,7 @@ function CalendarMeetingPreview({ meeting, meetings, onSelectMeeting }) {
             aria-selected={activeTimeline === 'previous'}
             onClick={() => setActiveTimeline('previous')}
           >
-            Previous
+            កន្លងទៅ
           </button>
         </div>
         <CalendarPanelList
@@ -238,7 +238,7 @@ export default function CalendarPage() {
                     if (todayMeeting) setSelectedMeetingId(todayMeeting.id)
                   }}
                 >
-                  Today
+                  ថ្ងៃនេះ
                 </button>
                 <button className="btn btn-secondary btn-sm" type="button" onClick={() => setVisibleMonth((month) => new Date(month.getFullYear(), month.getMonth() + 1, 1))}>›</button>
               </div>

@@ -98,8 +98,10 @@ function EmbeddedPortal({
           </button>
         ) : (
           <>
-            <button className="btn btn-secondary" type="button" onClick={onBack}>ត្រឡប់ទៅផ្ទាំងសេវាកម្ម</button>
-            <span>{titles[activePortal]}</span>
+            <button id="portal-back-btn" className="btn btn-secondary" type="button" onClick={onBack}>
+              ត្រឡប់ទៅផ្ទាំងសេវាកម្ម
+            </button>
+            <span id="portal-title">{titles[activePortal]}</span>
           </>
         )}
       </div>
