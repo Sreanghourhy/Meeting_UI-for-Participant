@@ -16,6 +16,8 @@ export default function ParticipantDetailModal({ participant, isVerified, onClos
     return null
   }
 
+  const fallbackText = participant.name.split(' ').filter(Boolean).pop()?.slice(0, 2) || 'OCM'
+
   function verify() {
     if (onVerify(participant.id)) {
       setMessage('បានបញ្ជាក់អ្នកចូលរួមដោយជោគជ័យ។')
@@ -38,7 +40,15 @@ export default function ParticipantDetailModal({ participant, isVerified, onClos
           ×
         </button>
         <div className="modal-profile">
-          <img src={participant.photo} alt={participant.name} />
+          <span className="participant-photo-fallback modal-photo-fallback" aria-hidden="true" hidden>{fallbackText}</span>
+          <img
+            src={participant.photo}
+            alt={participant.name}
+            onError={(event) => {
+              event.currentTarget.previousElementSibling.hidden = false
+              event.currentTarget.hidden = true
+            }}
+          />
           {isVerified ? <span className="modal-tick" aria-label="បានចុះវត្តមាន">✓</span> : null}
         </div>
         <div className="modal-content">

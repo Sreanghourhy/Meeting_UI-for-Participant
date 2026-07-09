@@ -1,4 +1,5 @@
 import { Suspense, lazy, useState } from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import AccessCodePage from './components/AccessCodePage.jsx'
 import PortalPage from './components/PortalPage.jsx'
 
@@ -18,6 +19,38 @@ const GuideParticipantApp = lazy(() => Promise.all([
   import('../../guide_particepant/src/App.jsx'),
 ]).then((modules) => ({ default: modules[1].default })))
 
+const ViewerCalendarApp = lazy(() => Promise.all([
+  import('react-pdf-highlighter/dist/style.css'),
+  import('../../Viewer_Calenda/src/styles.css'),
+  import('../../Viewer_Calenda/src/App.jsx'),
+]).then((modules) => ({ default: modules[2].default })))
+
+const WriterApp = lazy(() => Promise.all([
+  import('../../writer/src/styles.css'),
+  import('../../writer/src/App.jsx'),
+]).then((modules) => ({ default: modules[1].default })))
+
+const AdministratorApp = lazy(() => Promise.all([
+  import('../../Adminstrator/src/styles.css'),
+  import('../../Adminstrator/src/context/AppContext.jsx'),
+  import('../../Adminstrator/src/App.jsx'),
+]).then((modules) => {
+  const { AppProvider } = modules[1]
+  const AdminApp = modules[2].default
+
+  return {
+    default: function EmbeddedAdministratorApp() {
+      return (
+        <MemoryRouter>
+          <AppProvider>
+            <AdminApp />
+          </AppProvider>
+        </MemoryRouter>
+      )
+    },
+  }
+}))
+
 function EmbeddedPortal({
   activePortal,
   accessCode,
@@ -27,6 +60,9 @@ function EmbeddedPortal({
 }) {
   const titles = {
     'meeting-viewer': 'មើលព័ត៌មានកិច្ចប្រជុំ',
+    'viewer-calendar': 'ប្រតិទិនកិច្ចប្រជុំ',
+    writer: 'កន្លែងរៀបចំអ្នកចូលរួម',
+    administrator: 'រដ្ឋបាលការអញ្ជើញ',
     attendance: 'ចុះវត្តមានអ្នកចូលរួម',
     guide: 'មគ្គុទេសក៍ទីតាំង',
   }
@@ -39,6 +75,9 @@ function EmbeddedPortal({
       </div>
       <Suspense fallback={<div className="embedded-loading card">កំពុងបើក...</div>}>
         {activePortal === 'meeting-viewer' ? <ViewerApp skipAccess /> : null}
+        {activePortal === 'viewer-calendar' ? <ViewerCalendarApp skipAccess /> : null}
+        {activePortal === 'writer' ? <WriterApp /> : null}
+        {activePortal === 'administrator' ? <AdministratorApp /> : null}
         {activePortal === 'attendance' ? (
           <ParticipantVerifyApp
             initialCode={accessCode}

@@ -1,6 +1,6 @@
 :root {
-  --font-heading: "Moul", "Khmer OS Muol Light", "Khmer OS Moul Light", serif;
-  --font-body: "Khmer OS Siemreap", "Khmer OS Siem Reap", "Siemreap", "Noto Sans Khmer", "Segoe UI", system-ui, sans-serif;
+  --font-heading: "Moul", serif;
+  --font-body: "Siemreap", "Noto Sans Khmer", "Segoe UI", system-ui, sans-serif;
   --color-primary: #1d4ed8;
   --color-primary-hover: #4a8bc4;
   --color-accent: #f5a623;
@@ -257,6 +257,18 @@ button.portal-card {
 
 .portal-card.blue {
   --portal-color: #1d4ed8;
+}
+
+.portal-card.purple {
+  --portal-color: #7c3aed;
+}
+
+.portal-card.teal {
+  --portal-color: #0f766e;
+}
+
+.portal-card.red {
+  --portal-color: #dc2626;
 }
 
 .portal-card.green {

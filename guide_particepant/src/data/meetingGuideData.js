@@ -1,4 +1,3 @@
-const asset = (name) => `/assets/${name}`
 const roomAsset = (room, name) => `/assets/${room}/${name}`
 
 const sharedRoom708Steps = [
@@ -168,32 +167,32 @@ function makeRoom607Guides({ roomNumber, roomFolder, turnLabel, turnText }) {
 
 export const fallbackGuidePictures = [
   {
-    src: asset('photo_1_2026-07-06_15-00-07.jpg'),
+    src: roomAsset('708', 'choice_nunber.png'),
     title: 'ជំហានទី ១៖ ចាប់ផ្តើមពីច្រកចូល',
     text: 'ចាប់ផ្តើមពីតំបន់ច្រកចូល។ ប្រើរូបភាពនេះជាចំណុចសម្គាល់ដំបូង មុនពេលដើរទៅកាន់បន្ទប់ប្រជុំ។',
   },
   {
-    src: asset('photo_2_2026-07-06_15-00-07.jpg'),
+    src: roomAsset('708', 'go_thought.png'),
     title: 'ជំហានទី ២៖ ដើរតាមច្រកផ្លូវ',
     text: 'បន្តដើរតាមច្រកផ្លូវដែលបង្ហាញក្នុងរូបភាពនេះ។ ដើរត្រង់ទៅមុខ ហើយរកមើលចំណុចសម្គាល់បន្ទាប់។',
   },
   {
-    src: asset('photo_3_2026-07-06_15-00-07.jpg'),
+    src: roomAsset('708', 'out_turn_left.png'),
     title: 'ជំហានទី ៣៖ បន្តដើរត្រង់',
     text: 'នៅចំណុចនេះ សូមបន្តដើរត្រង់។ រូបភាពនេះជួយបញ្ជាក់ថាអ្នកកំពុងដើរតាមផ្លូវត្រឹមត្រូវ។',
   },
   {
-    src: asset('photo_4_2026-07-06_15-00-07.jpg'),
+    src: roomAsset('708', 'out_of_elevator_turn_left.png'),
     title: 'ជំហានទី ៤៖ ពិនិត្យតំបន់បន្ទប់',
     text: 'ពេលទៅដល់តំបន់នេះ សូមដើរយឺតៗ ហើយពិនិត្យស្លាកបន្ទប់ប្រជុំនៅជិតទ្វារ។',
   },
   {
-    src: asset('photo_5_2026-07-06_15-00-07.jpg'),
+    src: roomAsset('708', 'elevator.jpg'),
     title: 'ជំហានទី ៥៖ ទៅជិតបន្ទប់ប្រជុំ',
     text: 'ដើរទៅជិតផ្នែកបន្ទប់ប្រជុំ។ ប្រើរូបភាពនេះដើម្បីផ្ទៀងផ្ទាត់ច្រកផ្លូវ ឬតំបន់រង់ចាំចុងក្រោយ។',
   },
   {
-    src: asset('photo_6_2026-07-06_15-00-07.jpg'),
+    src: roomAsset('708', 'done.jpg'),
     title: 'ជំហានទី ៦៖ ទៅដល់បន្ទប់របស់អ្នក',
     text: 'អ្នកបានទៅដល់តំបន់បន្ទប់ប្រជុំហើយ។ សូមពិនិត្យឈ្មោះបន្ទប់ដែលអ្នកបានជ្រើសរើស មុនពេលចូល។',
   },

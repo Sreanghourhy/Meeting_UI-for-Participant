@@ -1,8 +1,18 @@
 export default function ParticipantCard({ participant, isVerified, onOpen }) {
+  const fallbackText = participant.name.split(' ').filter(Boolean).pop()?.slice(0, 2) || 'OCM'
+
   return (
     <article className="participant-card card">
       <button className="participant-photo-button" type="button" onClick={onOpen}>
-        <img src={participant.photo} alt={participant.name} />
+        <span className="participant-photo-fallback" aria-hidden="true" hidden>{fallbackText}</span>
+        <img
+          src={participant.photo}
+          alt={participant.name}
+          onError={(event) => {
+            event.currentTarget.previousElementSibling.hidden = false
+            event.currentTarget.hidden = true
+          }}
+        />
         {isVerified ? <span className="verified-tick" aria-label="បានចុះវត្តមាន">✓</span> : null}
       </button>
       <div className="participant-info">

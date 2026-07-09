@@ -1,6 +1,6 @@
 :root {
-  --font-heading: "Moul", "Khmer OS Muol Light", "Khmer OS Moul Light", serif;
-  --font-body: "Khmer OS Siemreap", "Khmer OS Siem Reap", "Siemreap", "Noto Sans Khmer", "Segoe UI", system-ui, sans-serif;
+  --font-heading: "Moul", serif;
+  --font-body: "Siemreap", "Noto Sans Khmer", "Segoe UI", system-ui, sans-serif;
   --color-primary: #1d4ed8;
   --color-primary-hover: #4a8bc4;
   --color-primary-light: #e8f4fc;
@@ -979,7 +979,7 @@ button {
 }
 
 .detail-title {
-  font-family: "Moul", "Khmer OS Muol Light", "Khmer OS Moul Light", serif;
+  font-family: var(--font-heading);
   font-synthesis: none;
   font-weight: 400;
   margin-bottom: 8px;
