@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import MeetingList from './components/MeetingList.jsx'
 import ParticipantNoteModal from './components/ParticipantNoteModal.jsx'
 import ParticipantList from './components/ParticipantList.jsx'
@@ -12,7 +12,7 @@ function sortMeetings(meetings) {
     .sort((left, right) => `${right.date} ${right.startTime}`.localeCompare(`${left.date} ${left.startTime}`))
 }
 
-export default function App() {
+export default function App({ onMeetingSelectChange }) {
   const meetings = useMemo(() => sortMeetings(getMeetings()), [])
   const [selectedMeetingId, setSelectedMeetingId] = useState(null)
   const [activeTab, setActiveTab] = useState('participants')
@@ -21,6 +21,12 @@ export default function App() {
   const selectedMeeting = meetings.find((meeting) => meeting.id === selectedMeetingId)
   const participants = selectedMeeting ? getMeetingParticipants(selectedMeeting) : []
   const noteKey = noteTarget?.participant && selectedMeeting ? `${selectedMeeting.id}:${noteTarget.participant.id}` : ''
+
+  useEffect(() => {
+    if (onMeetingSelectChange) {
+      onMeetingSelectChange(Boolean(selectedMeetingId))
+    }
+  }, [selectedMeetingId, onMeetingSelectChange])
 
   if (!meetings.length) {
     return (
@@ -32,13 +38,6 @@ export default function App() {
 
   return (
     <main className="page-content writer-page">
-      <header className="writer-topbar">
-        <div>
-          <span className="writer-kicker">Writer Workspace</span>
-          <h1>គ្រប់គ្រងកិច្ចប្រជុំ និងប្លង់តុ</h1>
-        </div>
-      </header>
-
       {!selectedMeeting ? (
         <MeetingList
           meetings={meetings}
@@ -53,7 +52,7 @@ export default function App() {
         <div className="writer-detail-layout">
           <section className="writer-main writer-main-full">
             <button className="btn btn-secondary writer-back-button" type="button" onClick={() => setSelectedMeetingId(null)}>
-              ត្រឡប់ទៅបញ្ជីកិច្ចប្រជុំ
+              ត្រឡប់ទៅ WRITER WORKSPACE
             </button>
 
             <article className="card writer-detail-card">

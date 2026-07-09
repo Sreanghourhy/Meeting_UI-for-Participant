@@ -61,6 +61,7 @@ function EmbeddedPortal({
   const [hashRoute, setHashRoute] = useState(window.location.hash.replace(/^#/, '') || '/')
   const [guideState, setGuideState] = useState({ step: 'rooms' })
   const [guideBackFn, setGuideBackFn] = useState(null)
+  const [writerMeetingSelected, setWriterMeetingSelected] = useState(false)
 
   const titles = {
     'meeting-viewer': 'មើលព័ត៌មានកិច្ចប្រជុំ',
@@ -73,6 +74,10 @@ function EmbeddedPortal({
   const isCalendarMeetingDetail = activePortal === 'viewer-calendar' && /^\/meetings\/[^/]+/.test(hashRoute)
 
   useEffect(() => {
+    setWriterMeetingSelected(false)
+  }, [activePortal])
+
+  useEffect(() => {
     const onHashChange = () => setHashRoute(window.location.hash.replace(/^#/, '') || '/')
     onHashChange()
     window.addEventListener('hashchange', onHashChange)
@@ -83,32 +88,36 @@ function EmbeddedPortal({
     window.location.hash = '/calendar'
   }
 
+  const shouldHideToolbar = activePortal === 'writer' && writerMeetingSelected
+
   return (
     <div className="embedded-portal">
-      <div className="embedded-toolbar">
-        {isCalendarMeetingDetail ? (
-          <button className="btn btn-secondary" type="button" onClick={backToCalendar}>ត្រឡប់ទៅប្រតិទិន</button>
-        ) : activePortal === 'guide' && guideState.step === 'doors' ? (
-          <button className="btn btn-secondary" type="button" onClick={() => guideBackFn && guideBackFn()}>
-            ត្រឡប់ក្រោយ
-          </button>
-        ) : activePortal === 'guide' && guideState.step === 'details' ? (
-          <button className="btn btn-secondary" type="button" onClick={() => guideBackFn && guideBackFn()}>
-            ត្រឡប់ក្រោយ ជ្រើសរើសទ្វារ
-          </button>
-        ) : (
-          <>
-            <button id="portal-back-btn" className="btn btn-secondary" type="button" onClick={onBack}>
-              ត្រឡប់ទៅផ្ទាំងសេវាកម្ម
+      {!shouldHideToolbar && (
+        <div className="embedded-toolbar">
+          {isCalendarMeetingDetail ? (
+            <button className="btn btn-secondary" type="button" onClick={backToCalendar}>ត្រឡប់ទៅប្រតិទិន</button>
+          ) : activePortal === 'guide' && guideState.step === 'doors' ? (
+            <button className="btn btn-secondary" type="button" onClick={() => guideBackFn && guideBackFn()}>
+              ត្រឡប់ក្រោយ
             </button>
-            <span id="portal-title">{titles[activePortal]}</span>
-          </>
-        )}
-      </div>
+          ) : activePortal === 'guide' && guideState.step === 'details' ? (
+            <button className="btn btn-secondary" type="button" onClick={() => guideBackFn && guideBackFn()}>
+              ត្រឡប់ក្រោយ ជ្រើសរើសទ្វារ
+            </button>
+          ) : (
+            <>
+              <button id="portal-back-btn" className="btn btn-secondary" type="button" onClick={onBack}>
+                ត្រឡប់ទៅផ្ទាំងសេវាកម្ម
+              </button>
+              <span id="portal-title">{titles[activePortal]}</span>
+            </>
+          )}
+        </div>
+      )}
       <Suspense fallback={<div className="embedded-loading card">កំពុងបើក...</div>}>
         {activePortal === 'meeting-viewer' ? <ViewerApp skipAccess /> : null}
         {activePortal === 'viewer-calendar' ? <ViewerCalendarApp skipAccess /> : null}
-        {activePortal === 'writer' ? <WriterApp /> : null}
+        {activePortal === 'writer' ? <WriterApp onMeetingSelectChange={setWriterMeetingSelected} /> : null}
         {activePortal === 'administrator' ? <AdministratorApp /> : null}
         {activePortal === 'attendance' ? (
           <ParticipantVerifyApp

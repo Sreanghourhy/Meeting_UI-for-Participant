@@ -28,9 +28,10 @@ export default function MeetingList({ meetings, selectedMeetingId, onSelectMeeti
 
   return (
     <section className={`writer-meeting-section writer-meeting-section-${variant}`}>
-      <div className="writer-sidebar-header">
+      <div className="writer-sidebar-header" style={{ alignItems: 'flex-end' }}>
         <div>
-          <span>បញ្ជីកិច្ចប្រជុំ</span>
+          <span className="writer-kicker" style={{ display: 'block', fontSize: '11px', fontWeight: '600', letterSpacing: '0.05em', color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>WRITER WORKSPACE</span>
+          <span style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a' }}>គ្រប់គ្រងកិច្ចប្រជុំ និងប្លង់តុ</span>
         </div>
         <strong>{toKhmerNumeral(filteredMeetings.length)}</strong>
       </div>
