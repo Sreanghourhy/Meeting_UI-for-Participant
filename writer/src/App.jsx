@@ -3,6 +3,7 @@ import MeetingList from './components/MeetingList.jsx'
 import ParticipantNoteModal from './components/ParticipantNoteModal.jsx'
 import ParticipantList from './components/ParticipantList.jsx'
 import TablePlan from './components/TablePlan.jsx'
+import AssistantTab from './components/AssistantTab.jsx'
 import { formatDate, formatTimeRange, getMeetings, getStatusBadge } from './utils/data.js'
 import { getDisplayVenue, getMeetingParticipants, getStatusLabel, toKhmerNumeral } from './components/meetingDisplay.js'
 
@@ -21,6 +22,17 @@ export default function App({ onMeetingSelectChange }) {
   const selectedMeeting = meetings.find((meeting) => meeting.id === selectedMeetingId)
   const participants = selectedMeeting ? getMeetingParticipants(selectedMeeting) : []
   const noteKey = noteTarget?.participant && selectedMeeting ? `${selectedMeeting.id}:${noteTarget.participant.id}` : ''
+
+  const appendParticipantNote = (participantId, value) => {
+    if (!selectedMeeting || !participantId || !value?.trim()) return
+
+    const targetKey = `${selectedMeeting.id}:${participantId}`
+    setParticipantNotes((current) => {
+      const existing = current[targetKey]
+      const existingItems = Array.isArray(existing) ? existing : existing?.trim() ? [existing] : []
+      return { ...current, [targetKey]: [...existingItems, value] }
+    })
+  }
 
   useEffect(() => {
     if (onMeetingSelectChange) {
@@ -104,6 +116,15 @@ export default function App({ onMeetingSelectChange }) {
               >
                 ប្លង់តុ
               </button>
+              <button
+                className={`writer-tab ${activeTab === 'assistant' ? 'active' : ''}`}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'assistant'}
+                onClick={() => setActiveTab('assistant')}
+              >
+                ជំនួយការ AI
+              </button>
             </div>
 
             {activeTab === 'participants' ? (
@@ -112,11 +133,17 @@ export default function App({ onMeetingSelectChange }) {
                 notes={participantNotes}
                 onOpenNote={(participant) => setNoteTarget({ participant, mode: 'text' })}
               />
-            ) : (
+            ) : activeTab === 'table' ? (
               <TablePlan
                 meeting={selectedMeeting}
                 notes={participantNotes}
                 onOpenNote={(participant) => setNoteTarget({ participant, mode: 'list' })}
+              />
+            ) : (
+              <AssistantTab
+                meeting={selectedMeeting}
+                participants={participants}
+                onAddNote={appendParticipantNote}
               />
             )}
           </section>
