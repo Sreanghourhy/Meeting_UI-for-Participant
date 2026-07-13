@@ -20,8 +20,22 @@
     "vip": "ភ្ញៀវកិត្តិយស ១២ នាក់",
     "notes": "# Q2 Strategy Review\n\n## Key Discussion Points\n\n- [ ] Revenue targets\n- [ ] Market expansion\n- [x] Team restructuring\n\n> Focus on APAC region growth",
     "documents": [
-      { "id": "d1", "name": "កំណត់ត្រាសេចក្តីព្រាង", "type": "document", "category": "Presentation", "url": "/docs/Q2_Strategy_Deck.pdf", "pageCount": 3 },
-      { "id": "d2", "name": "របាយការណ៍ហិរញ្ញវត្ថុសង្ខេប.pdf", "type": "document", "category": "Reference", "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", "size": "856 KB", "pageCount": 1 }
+      { "id": "d1", "name": "កំណត់ត្រាសេចក្តីព្រាង", "type": "document", "category": "Presentation", "url": "/docs/meeting-doc-11.pdf", "pageCount": 15 },
+      { "id": "d2", "name": "របាយការណ៍ហិរញ្ញវត្ថុសង្ខេប.pdf", "type": "document", "category": "Reference", "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", "size": "856 KB", "pageCount": 1 },
+      { "id": "uploaded-pdf-01", "name": "Project Define Requirements and Function.pdf", "type": "document", "category": "Reference", "url": "/docs/meeting-doc-01.pdf", "size": 99140, "status": "Available" },
+      { "id": "uploaded-pdf-02", "name": "Project Idea.pdf", "type": "document", "category": "Reference", "url": "/docs/meeting-doc-02.pdf", "size": 97345, "status": "Available" },
+      { "id": "uploaded-pdf-03", "name": "Ai Report.pdf", "type": "document", "category": "Supporting", "url": "/docs/meeting-doc-03.pdf", "size": 1277799, "status": "Available" },
+      { "id": "uploaded-pdf-04", "name": "Rescued document.pdf", "type": "document", "category": "Reference", "url": "/docs/meeting-doc-04.pdf", "size": 125904, "status": "Available" },
+      { "id": "uploaded-pdf-05", "name": "Student_List_for_Document_Preparation_Gen9_InternshipII_6Months.pdf", "type": "document", "category": "Supporting", "url": "/docs/meeting-doc-05.pdf", "size": 91046, "status": "Available" },
+      { "id": "uploaded-pdf-06", "name": "Software QA.pdf", "type": "document", "category": "Reference", "url": "/docs/meeting-doc-06.pdf", "size": 46786, "status": "Available" },
+      { "id": "uploaded-pdf-07", "name": "V1. APPLICATION FORM INTRANET.pdf", "type": "document", "category": "Supporting", "url": "/docs/meeting-doc-07.pdf", "size": 121159, "status": "Available" },
+      { "id": "uploaded-pdf-08", "name": "ការវិភាគលើលំហូរការងារកិច្ចប្រជុំ_docx.pdf", "type": "document", "category": "Reference", "url": "/docs/meeting-doc-08.pdf", "size": 495376, "status": "Available" },
+      { "id": "uploaded-pdf-09", "name": "ការវិភាគលើលំហូរការងារកិច្ចប្រជុំ_កំណែប្រែទី១_activity.pdf", "type": "document", "category": "Supporting", "url": "/docs/meeting-doc-09.pdf", "size": 763525, "status": "Available" },
+      { "id": "uploaded-pdf-10", "name": "ការវិភាគលើលំហូរការងារកិច្ចប្រជុំ_កំណែប្រែទី១_sequencial.pdf", "type": "document", "category": "Supporting", "url": "/docs/meeting-doc-10.pdf", "size": 1587245, "status": "Available" },
+      { "id": "uploaded-pdf-11", "name": "ព័ត៌មានសង្ខេបនៃប្រព័ន្ធគ្រប់គ្រងអង្គប្រជុំv4.pdf", "type": "document", "category": "Reference", "url": "/docs/meeting-doc-11.pdf", "size": 843712, "status": "Available" },
+      { "id": "uploaded-pdf-12", "name": "របាយការណ៍សម្រង់សមិទ្ធិផលការងារ.pdf", "type": "document", "category": "Supporting", "url": "/docs/meeting-doc-12.pdf", "size": 136151, "status": "Available" },
+      { "id": "uploaded-pdf-13", "name": "របាយការណ៍សិក្សានិងធ្វើបច្ចុប្បន្នភាពលើគម្រោងប្រព័ន្ធកិច្ចប្រជុំ (2).pdf", "type": "document", "category": "Reference", "url": "/docs/meeting-doc-13.pdf", "size": 99401, "status": "Available" },
+      { "id": "uploaded-pdf-14", "name": "របាយការណ៍សិក្សានិងធ្វើបច្ចុប្បន្នភាពលើគម្រោងប្រព័ន្ធកិច្ចប្រជុំ.pdf", "type": "document", "category": "Reference", "url": "/docs/meeting-doc-14.pdf", "size": 533805, "status": "Available" }
     ],
     "agenda": [
       { "id": "a1", "title": "Opening Remarks", "description": "Welcome and objectives", "startTime": "09:00", "endTime": "09:15", "presenterId": "u1", "duration": 15, "session": "morning" },

@@ -19,7 +19,7 @@ export default function ParticipantList({ meeting, notes = {}, onOpenNote }) {
   })
 
   return (
-    <section className="card writer-panel-card">
+    <section className="card writer-panel-card writer-participant-panel">
       <div className="card-header writer-panel-header">
         <span className="card-title">បញ្ជីអ្នកចូលរួម</span>
         <span className="badge badge-neutral">{toKhmerNumeral(filteredParticipants.length)} / {toKhmerNumeral(participants.length)}</span>

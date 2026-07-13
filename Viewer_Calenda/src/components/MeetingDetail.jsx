@@ -298,7 +298,7 @@ function AgendaTab({ meeting, activePanel, selectedDocument, onSelectDocument, o
   )
 }
 
-export default function MeetingDetail({ meetingId, detailTitle }) {
+export default function MeetingDetail({ meetingId, detailTitle, onBackToServices }) {
   const meeting = getMeetingById(meetingId)
   const [activePanel, setActivePanel] = useState('agenda')
   const [selectedDocument, setSelectedDocument] = useState(null)
@@ -322,12 +322,18 @@ export default function MeetingDetail({ meetingId, detailTitle }) {
       <div className="meeting-detail">
         <div className="detail-header card">
           <div className="card-body">
-            <div className="detail-portal-toolbar">
-              <button className="btn btn-secondary" type="button" onClick={() => goTo('/calendar')}>
-                ត្រឡប់ទៅប្រតិទិន
-              </button>
-              <span>{detailTitle || 'មើលព័ត៌មានកិច្ចប្រជុំ'}</span>
-            </div>
+            {detailTitle || onBackToServices ? (
+              <div className="detail-portal-toolbar">
+                <button
+                  className="btn btn-secondary"
+                  type="button"
+                  onClick={onBackToServices || (() => goTo('/calendar'))}
+                >
+                  {onBackToServices ? 'ត្រឡប់ទៅផ្ទាំងសេវាកម្ម' : 'ត្រឡប់ទៅប្រតិទិន'}
+                </button>
+                <span>{detailTitle || 'មើលព័ត៌មានកិច្ចប្រជុំ'}</span>
+              </div>
+            ) : null}
             <div className="header-top">
               <div>
                 <div className="page-eyebrow">ព័ត៌មានលម្អិតកិច្ចប្រជុំ</div>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { formatDate, formatTimeRange, getMeetingById } from '../utils/data.js'
 import DocumentPreview from './DocumentPreview.jsx'
 import { getMeetingParticipants } from './Participants.jsx'
@@ -141,6 +141,7 @@ export function formatDraftDocumentDate(document) {
 }
 
 function getDocumentCategory(document) {
+  if (document.id?.startsWith('uploaded-pdf-')) return 'Law'
   if (document.category) return document.category
 
   const name = document.name.toLowerCase()
@@ -196,6 +197,7 @@ function groupDocuments(documents) {
 
 export function DocumentsCard({ meeting, selectedDocument, onSelectDocument, isCollapsed, onToggleCollapse }) {
   const [categoryFilter, setCategoryFilter] = useState('')
+  const selectedIconRef = useRef(null)
   const documents = getMeetingDocuments(meeting)
   const categories = documentCategoryOrder.filter((category) => documents.some((doc) => doc.category === category))
   const filteredDocuments = documents.filter((doc) => {
@@ -203,6 +205,10 @@ export function DocumentsCard({ meeting, selectedDocument, onSelectDocument, isC
 
     return matchesCategory
   })
+
+  useEffect(() => {
+    if (isCollapsed) selectedIconRef.current?.scrollIntoView({ block: 'nearest' })
+  }, [isCollapsed, selectedDocument?.id])
 
   if (isCollapsed) {
     return (
@@ -218,6 +224,7 @@ export function DocumentsCard({ meeting, selectedDocument, onSelectDocument, isC
         <div className="document-icon-list">
           {documents.map((doc) => (
             <button
+              ref={selectedDocument?.id === doc.id ? selectedIconRef : null}
               key={doc.id}
               className={`document-icon-only icon-${doc.category.toLowerCase()} ${selectedDocument?.id === doc.id ? 'selected' : ''}`}
               type="button"

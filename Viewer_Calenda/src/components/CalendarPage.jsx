@@ -66,18 +66,6 @@ function getCalendarPreviewTitle(meeting) {
   return titles[meeting.id] || meeting.title
 }
 
-function getCalendarPreviewType(meeting) {
-  const types = {
-    m1: 'Strategy meeting',
-    m2: 'Development meeting',
-    m3: 'Governance meeting',
-    m4: 'Operations meeting',
-    m5: 'Sales meeting',
-    m6: 'HR meeting',
-  }
-  return types[meeting.id] || `${meeting.category || 'Team'} meeting`
-}
-
 function CalendarPanelList({ title, meetings, selectedMeetingId, onSelectMeeting }) {
   return (
     <div className={title ? 'calendar-panel-section' : 'calendar-panel-inline'}>
@@ -118,20 +106,19 @@ function CalendarMeetingPreview({ meeting, meetings, onSelectMeeting }) {
       {meeting ? (
         <article className="calendar-preview-card">
           <div className="calendar-preview-heading">
-            <h2>{getCalendarPreviewTitle(meeting)}</h2>
-            <p>{getCalendarPreviewType(meeting)}</p>
+            <h2>{getDisplayMeetingTitle(meeting)}</h2>
           </div>
 
           <div className="calendar-preview-meta">
-            <div>{formatDate(meeting.date)}</div>
-            <div>{formatTimeRange(meeting.startTime, meeting.endTime)}</div>
-            <div>{meeting.venue}</div>
+            <span>{formatDate(meeting.date)}</span>
+            <span>{formatTimeRange(meeting.startTime, meeting.endTime)}</span>
+            <span>{meeting.venue}</span>
           </div>
 
           <div className="calendar-preview-attendees">
             <span className="calendar-preview-label">អ្នកចូលរួម</span>
             <div className="calendar-attendee-list">
-              {attendees.map((attendee) => (
+              {attendees.slice(0, 3).map((attendee) => (
                 <div key={attendee.id} className="calendar-attendee-row">
                   <span className="calendar-attendee-avatar">{attendee.avatar}</span>
                   <span>{getUserName(attendee)}</span>

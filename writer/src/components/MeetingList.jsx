@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { formatDate, formatTimeRange, getStatusBadge } from '../utils/data.js'
 import { getDisplayVenue, getMeetingParticipants, getStatusLabel, toKhmerNumeral } from './meetingDisplay.js'
 
-export default function MeetingList({ meetings, selectedMeetingId, onSelectMeeting, variant = 'sidebar' }) {
+export default function MeetingList({ meetings, selectedMeetingId, onSelectMeeting, variant = 'sidebar', onBackToServices, portalTitle }) {
   const [search, setSearch] = useState('')
   const [appliedSearch, setAppliedSearch] = useState('')
   const [placeFilter, setPlaceFilter] = useState('')
@@ -28,12 +28,22 @@ export default function MeetingList({ meetings, selectedMeetingId, onSelectMeeti
 
   return (
     <section className={`writer-meeting-section writer-meeting-section-${variant}`}>
-      <div className="writer-sidebar-header" style={{ alignItems: 'flex-end' }}>
-        <div>
-          <span className="writer-kicker" style={{ display: 'block', fontSize: '11px', fontWeight: '600', letterSpacing: '0.05em', color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>WRITER WORKSPACE</span>
-          <span style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a' }}>គ្រប់គ្រងកិច្ចប្រជុំ និងប្លង់តុ</span>
+      <div className="writer-sidebar-header">
+        {onBackToServices ? (
+          <div className="writer-portal-toolbar">
+            <button className="btn btn-secondary" type="button" onClick={onBackToServices}>
+              ត្រឡប់ទៅផ្ទាំងសេវាកម្ម
+            </button>
+            <span>{portalTitle}</span>
+          </div>
+        ) : null}
+        <div className="writer-heading-copy">
+          <span className="writer-heading-icon" aria-hidden="true">✦</span>
+          <div>
+            <span className="writer-meeting-heading">គ្រប់គ្រងកិច្ចប្រជុំ និងប្លង់តុ</span>
+            <small>រៀបចំកិច្ចប្រជុំ អ្នកចូលរួម និងប្លង់តុក្នុងកន្លែងតែមួយ</small>
+          </div>
         </div>
-        <strong>{toKhmerNumeral(filteredMeetings.length)}</strong>
       </div>
 
       <div className="writer-meeting-filters">
@@ -110,7 +120,7 @@ export default function MeetingList({ meetings, selectedMeetingId, onSelectMeeti
                     <button className="writer-meeting-title-button" type="button" onClick={() => onSelectMeeting(meeting.id)}>
                       {meeting.title}
                     </button>
-                    <div className="muted-small">#{meeting.meetingCode}</div>
+                    <div className="writer-meeting-code">#{meeting.meetingCode}</div>
                   </td>
                   <td>{formatDate(meeting.date)}</td>
                   <td>{formatTimeRange(meeting.startTime, meeting.endTime)}</td>

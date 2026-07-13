@@ -4,8 +4,8 @@ import ParticipantNoteModal from './components/ParticipantNoteModal.jsx'
 import ParticipantList from './components/ParticipantList.jsx'
 import TablePlan from './components/TablePlan.jsx'
 import AssistantTab from './components/AssistantTab.jsx'
-import { formatDate, formatTimeRange, getMeetings, getStatusBadge } from './utils/data.js'
-import { getDisplayVenue, getMeetingParticipants, getStatusLabel, toKhmerNumeral } from './components/meetingDisplay.js'
+import { getMeetings, getStatusBadge } from './utils/data.js'
+import { getMeetingParticipants, getStatusLabel, toKhmerNumeral } from './components/meetingDisplay.js'
 
 function sortMeetings(meetings) {
   return meetings
@@ -13,7 +13,7 @@ function sortMeetings(meetings) {
     .sort((left, right) => `${right.date} ${right.startTime}`.localeCompare(`${left.date} ${left.startTime}`))
 }
 
-export default function App({ onMeetingSelectChange }) {
+export default function App({ onMeetingSelectChange, onBackToServices, portalTitle }) {
   const meetings = useMemo(() => sortMeetings(getMeetings()), [])
   const [selectedMeetingId, setSelectedMeetingId] = useState(null)
   const [activeTab, setActiveTab] = useState('participants')
@@ -55,6 +55,8 @@ export default function App({ onMeetingSelectChange }) {
           meetings={meetings}
           selectedMeetingId={selectedMeetingId}
           variant="grid"
+          onBackToServices={onBackToServices}
+          portalTitle={portalTitle}
           onSelectMeeting={(meetingId) => {
             setSelectedMeetingId(meetingId)
             setActiveTab('participants')
@@ -63,36 +65,39 @@ export default function App({ onMeetingSelectChange }) {
       ) : (
         <div className="writer-detail-layout">
           <section className="writer-main writer-main-full">
-            <button className="btn btn-secondary writer-back-button" type="button" onClick={() => setSelectedMeetingId(null)}>
-              ត្រឡប់ទៅ WRITER WORKSPACE
-            </button>
-
             <article className="card writer-detail-card">
+              {onBackToServices ? (
+                <div className="writer-portal-toolbar">
+                  <button className="btn btn-secondary" type="button" onClick={onBackToServices}>
+                    ត្រឡប់ទៅផ្ទាំងសេវាកម្ម
+                  </button>
+                  <span>{portalTitle}</span>
+                </div>
+              ) : null}
               <div className="writer-detail-header">
                 <div>
                   <span className={`badge ${getStatusBadge(selectedMeeting.status)}`}>{getStatusLabel(selectedMeeting.status)}</span>
                   <h2>{selectedMeeting.title}</h2>
-                  <p>{formatDate(selectedMeeting.date)} • {formatTimeRange(selectedMeeting.startTime, selectedMeeting.endTime)} • {getDisplayVenue(selectedMeeting)}</p>
                 </div>
                 <div className="writer-code-pill">#{selectedMeeting.meetingCode}</div>
               </div>
 
-              <div className="writer-summary-grid">
-                <div>
-                  <span>ប្រភេទ</span>
-                  <strong>{selectedMeeting.meetingType || selectedMeeting.category || '-'}</strong>
+              <div className="writer-summary-grid compact-header-info">
+                <div className="info-item">
+                  <span className="info-label">ប្រភេទ</span>
+                  <strong className="info-value">{selectedMeeting.meetingType || selectedMeeting.category || '-'}</strong>
                 </div>
-                <div>
-                  <span>អ្នកចូលរួម</span>
-                  <strong>{toKhmerNumeral(participants.length)} នាក់</strong>
+                <div className="info-item">
+                  <span className="info-label">អ្នកចូលរួម</span>
+                  <strong className="info-value attendee-count-text">{toKhmerNumeral(participants.length)} នាក់</strong>
                 </div>
-                <div>
-                  <span>កម្រិត</span>
-                  <strong>{selectedMeeting.level || '-'}</strong>
+                <div className="info-item">
+                  <span className="info-label">កម្រិត</span>
+                  <strong className="info-value">{selectedMeeting.level || '-'}</strong>
                 </div>
-                <div>
-                  <span>ទម្រង់</span>
-                  <strong>{selectedMeeting.meetingMode || '-'}</strong>
+                <div className="info-item">
+                  <span className="info-label">ទម្រង់</span>
+                  <strong className="info-value">{selectedMeeting.meetingMode || '-'}</strong>
                 </div>
               </div>
             </article>

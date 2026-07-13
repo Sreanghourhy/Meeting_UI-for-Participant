@@ -79,8 +79,7 @@ function EmbeddedPortal({
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
-  const isCalendarLanding = activePortal === 'viewer-calendar' && !isCalendarMeetingDetail
-  const usesNativeDetailToolbar = activePortal === 'meeting-viewer' || isCalendarMeetingDetail
+  const usesOuterToolbar = activePortal === 'meeting-viewer' || activePortal === 'writer' || activePortal === 'viewer-calendar'
 
   function renderPortalControls(className = 'embedded-toolbar') {
     return (
@@ -98,7 +97,9 @@ function EmbeddedPortal({
             <button id="portal-back-btn" className="btn btn-secondary" type="button" onClick={onBack}>
               ត្រឡប់ទៅផ្ទាំងសេវាកម្ម
             </button>
-            <span id="portal-title">{titles[activePortal]}</span>
+            <span id="portal-title">
+              {isCalendarMeetingDetail ? 'មើលព័ត៌មានកិច្ចប្រជុំ' : titles[activePortal]}
+            </span>
           </>
         )}
       </div>
@@ -107,25 +108,20 @@ function EmbeddedPortal({
 
   return (
     <div className="embedded-portal">
-      {isCalendarLanding ? renderPortalControls() : null}
+      {usesOuterToolbar ? renderPortalControls() : null}
       <Suspense fallback={<div className="embedded-loading card">កំពុងបើក...</div>}>
-        {!usesNativeDetailToolbar && !isCalendarLanding
+        {!usesOuterToolbar
           ? renderPortalControls('embedded-toolbar embedded-toolbar-integrated')
           : null}
         {activePortal === 'meeting-viewer' ? (
-          <ViewerApp
-            skipAccess
-            onBackToServices={onBack}
-            portalTitle={titles['meeting-viewer']}
-          />
+          <ViewerApp skipAccess />
         ) : null}
         {activePortal === 'viewer-calendar' ? (
-          <ViewerCalendarApp
-            skipAccess
-            detailTitle="មើលព័ត៌មានកិច្ចប្រជុំ"
-          />
+          <ViewerCalendarApp skipAccess />
         ) : null}
-        {activePortal === 'writer' ? <WriterApp /> : null}
+        {activePortal === 'writer' ? (
+          <WriterApp />
+        ) : null}
         {activePortal === 'administrator' ? <AdministratorApp /> : null}
         {activePortal === 'attendance' ? (
           <ParticipantVerifyApp

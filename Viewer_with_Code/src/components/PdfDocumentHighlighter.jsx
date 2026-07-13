@@ -121,7 +121,11 @@ export function PdfDocumentHighlighter({
           url={documentUrl}
           workerSrc={pdfWorkerUrl}
           beforeLoad={<div className="pdf-loader-state">Loading PDF...</div>}
-          errorMessage={<div className="pdf-loader-state error">Unable to load this PDF.</div>}
+          errorMessage={(
+            <div className="pdf-native-fallback">
+              <iframe src={`${documentUrl}#view=FitH`} title="PDF document" />
+            </div>
+          )}
         >
           {(pdfDocument) => (
             <PdfHighlighter

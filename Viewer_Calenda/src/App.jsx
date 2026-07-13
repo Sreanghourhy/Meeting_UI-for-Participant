@@ -21,7 +21,7 @@ function goTo(path) {
   window.location.hash = path
 }
 
-export default function App({ skipAccess = false, detailTitle }) {
+export default function App({ skipAccess = false, detailTitle, onBackToServices }) {
   const route = useHashRoute()
   const [authorized, setAuthorized] = useState(skipAccess)
   const docsMatch = route.match(/^\/docs\/([^/]+)\/?([^/]*)/)
@@ -47,7 +47,13 @@ export default function App({ skipAccess = false, detailTitle }) {
   }
 
   if (meetingMatch) {
-    return <MeetingDetail meetingId={meetingMatch[1]} detailTitle={detailTitle} />
+    return (
+      <MeetingDetail
+        meetingId={meetingMatch[1]}
+        detailTitle={detailTitle}
+        onBackToServices={onBackToServices}
+      />
+    )
   }
 
   if (calendarMatch) {
