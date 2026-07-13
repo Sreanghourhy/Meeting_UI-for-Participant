@@ -14,7 +14,7 @@ export const portalSections = [
 export const portals = [
   {
     id: 'meeting-viewer',
-    title: 'មើលតាមលេខកូដ',
+    title: 'មើលកិច្ចប្រជុំ',
     description: 'មើលព័ត៌មានកិច្ចប្រជុំតាមលេខកូដ ឬ QR Code',
     label: 'Viewer with Code',
     icon: 'qrCode',

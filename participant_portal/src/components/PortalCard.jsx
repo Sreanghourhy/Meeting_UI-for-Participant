@@ -14,12 +14,13 @@ export default function PortalCard({ portal, onOpen }) {
 
   return (
     <button className="portal-card card" type="button" onClick={() => onOpen(portal.id)}>
-      <span className="portal-icon" aria-hidden="true">
-        <Icon size={28} strokeWidth={2.2} />
+      <span className="portal-card-heading">
+        <span className="portal-icon" aria-hidden="true">
+          <Icon size={28} strokeWidth={2.2} />
+        </span>
+        <strong>{portal.title}</strong>
       </span>
       <span className="portal-content">
-        <span className="portal-label">{portal.label}</span>
-        <strong>{portal.title}</strong>
         <span>{portal.description}</span>
       </span>
       <span className="portal-action">

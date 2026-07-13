@@ -322,7 +322,7 @@ function MeetingHeaderInfo({ meeting, compact = false }) {
   )
 }
 
-function MeetingDetail({ meetingId }) {
+function MeetingDetail({ meetingId, onBackToServices, portalTitle }) {
   const meeting = getMeetingById(meetingId)
   const [activePanel, setActivePanel] = useState('agenda')
   const [selectedDocument, setSelectedDocument] = useState(null)
@@ -346,6 +346,14 @@ function MeetingDetail({ meetingId }) {
       <div className="meeting-detail">
         <div className="detail-header card">
           <div className="card-body">
+            {onBackToServices ? (
+              <div className="detail-portal-toolbar">
+                <button className="btn btn-secondary" type="button" onClick={onBackToServices}>
+                  ត្រឡប់ទៅផ្ទាំងសេវាកម្ម
+                </button>
+                <span>{portalTitle}</span>
+              </div>
+            ) : null}
             <div className="header-top">
               <div>
                 <div className="page-eyebrow">ព័ត៌មានលម្អិតកិច្ចប្រជុំ</div>
@@ -388,7 +396,7 @@ function MeetingDetail({ meetingId }) {
   )
 }
 
-export default function App({ skipAccess = false }) {
+export default function App({ skipAccess = false, onBackToServices, portalTitle }) {
   const route = useHashRoute()
   const [authorized, setAuthorized] = useState(skipAccess)
   const docsMatch = route.match(/^\/docs\/([^/]+)\/?([^/]*)/)
@@ -414,8 +422,20 @@ export default function App({ skipAccess = false }) {
   }
 
   if (meetingMatch) {
-    return <MeetingDetail meetingId={meetingMatch[1]} />
+    return (
+      <MeetingDetail
+        meetingId={meetingMatch[1]}
+        onBackToServices={onBackToServices}
+        portalTitle={portalTitle}
+      />
+    )
   }
 
-  return <MeetingDetail meetingId="m1" />
+  return (
+    <MeetingDetail
+      meetingId="m1"
+      onBackToServices={onBackToServices}
+      portalTitle={portalTitle}
+    />
+  )
 }

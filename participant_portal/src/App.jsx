@@ -61,7 +61,6 @@ function EmbeddedPortal({
   const [hashRoute, setHashRoute] = useState(window.location.hash.replace(/^#/, '') || '/')
   const [guideState, setGuideState] = useState({ step: 'rooms' })
   const [guideBackFn, setGuideBackFn] = useState(null)
-  const [writerMeetingSelected, setWriterMeetingSelected] = useState(false)
 
   const titles = {
     'meeting-viewer': 'មើលព័ត៌មានកិច្ចប្រជុំ',
@@ -74,50 +73,59 @@ function EmbeddedPortal({
   const isCalendarMeetingDetail = activePortal === 'viewer-calendar' && /^\/meetings\/[^/]+/.test(hashRoute)
 
   useEffect(() => {
-    setWriterMeetingSelected(false)
-  }, [activePortal])
-
-  useEffect(() => {
     const onHashChange = () => setHashRoute(window.location.hash.replace(/^#/, '') || '/')
     onHashChange()
     window.addEventListener('hashchange', onHashChange)
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
-  function backToCalendar() {
-    window.location.hash = '/calendar'
-  }
+  const isCalendarLanding = activePortal === 'viewer-calendar' && !isCalendarMeetingDetail
+  const usesNativeDetailToolbar = activePortal === 'meeting-viewer' || isCalendarMeetingDetail
 
-  const shouldHideToolbar = activePortal === 'writer' && writerMeetingSelected
+  function renderPortalControls(className = 'embedded-toolbar') {
+    return (
+      <div className={className}>
+        {activePortal === 'guide' && guideState.step === 'doors' ? (
+          <button className="btn btn-secondary" type="button" onClick={() => guideBackFn && guideBackFn()}>
+            ត្រឡប់ក្រោយ
+          </button>
+        ) : activePortal === 'guide' && guideState.step === 'details' ? (
+          <button className="btn btn-secondary" type="button" onClick={() => guideBackFn && guideBackFn()}>
+            ត្រឡប់ក្រោយ ជ្រើសរើសទ្វារ
+          </button>
+        ) : (
+          <>
+            <button id="portal-back-btn" className="btn btn-secondary" type="button" onClick={onBack}>
+              ត្រឡប់ទៅផ្ទាំងសេវាកម្ម
+            </button>
+            <span id="portal-title">{titles[activePortal]}</span>
+          </>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="embedded-portal">
-      {!shouldHideToolbar && (
-        <div className="embedded-toolbar">
-          {isCalendarMeetingDetail ? (
-            <button className="btn btn-secondary" type="button" onClick={backToCalendar}>ត្រឡប់ទៅប្រតិទិន</button>
-          ) : activePortal === 'guide' && guideState.step === 'doors' ? (
-            <button className="btn btn-secondary" type="button" onClick={() => guideBackFn && guideBackFn()}>
-              ត្រឡប់ក្រោយ
-            </button>
-          ) : activePortal === 'guide' && guideState.step === 'details' ? (
-            <button className="btn btn-secondary" type="button" onClick={() => guideBackFn && guideBackFn()}>
-              ត្រឡប់ក្រោយ ជ្រើសរើសទ្វារ
-            </button>
-          ) : (
-            <>
-              <button id="portal-back-btn" className="btn btn-secondary" type="button" onClick={onBack}>
-                ត្រឡប់ទៅផ្ទាំងសេវាកម្ម
-              </button>
-              <span id="portal-title">{titles[activePortal]}</span>
-            </>
-          )}
-        </div>
-      )}
+      {isCalendarLanding ? renderPortalControls() : null}
       <Suspense fallback={<div className="embedded-loading card">កំពុងបើក...</div>}>
-        {activePortal === 'meeting-viewer' ? <ViewerApp skipAccess /> : null}
-        {activePortal === 'viewer-calendar' ? <ViewerCalendarApp skipAccess /> : null}
-        {activePortal === 'writer' ? <WriterApp onMeetingSelectChange={setWriterMeetingSelected} /> : null}
+        {!usesNativeDetailToolbar && !isCalendarLanding
+          ? renderPortalControls('embedded-toolbar embedded-toolbar-integrated')
+          : null}
+        {activePortal === 'meeting-viewer' ? (
+          <ViewerApp
+            skipAccess
+            onBackToServices={onBack}
+            portalTitle={titles['meeting-viewer']}
+          />
+        ) : null}
+        {activePortal === 'viewer-calendar' ? (
+          <ViewerCalendarApp
+            skipAccess
+            detailTitle="មើលព័ត៌មានកិច្ចប្រជុំ"
+          />
+        ) : null}
+        {activePortal === 'writer' ? <WriterApp /> : null}
         {activePortal === 'administrator' ? <AdministratorApp /> : null}
         {activePortal === 'attendance' ? (
           <ParticipantVerifyApp
