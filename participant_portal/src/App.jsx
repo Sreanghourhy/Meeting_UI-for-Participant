@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import AccessCodePage from './components/AccessCodePage.jsx'
 import PortalPage from './components/PortalPage.jsx'
@@ -88,6 +88,11 @@ function EmbeddedPortal({
     'guide',
   ].includes(activePortal)
 
+  const handleGuideStepChange = useCallback((step, backFn) => {
+    setGuideState((current) => (current.step === step ? current : { step }))
+    setGuideBackFn(() => backFn || null)
+  }, [])
+
   function renderPortalControls(className = 'embedded-toolbar') {
     return (
       <div className={className}>
@@ -139,10 +144,7 @@ function EmbeddedPortal({
         ) : null}
         {activePortal === 'guide' ? (
           <GuideParticipantApp
-            onStepChange={(step, backFn) => {
-              setGuideState({ step })
-              setGuideBackFn(() => backFn)
-            }}
+            onStepChange={handleGuideStepChange}
           />
         ) : null}
       </Suspense>
