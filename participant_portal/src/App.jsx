@@ -79,7 +79,14 @@ function EmbeddedPortal({
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
-  const usesOuterToolbar = activePortal === 'meeting-viewer' || activePortal === 'writer' || activePortal === 'viewer-calendar'
+  const usesOuterToolbar = [
+    'meeting-viewer',
+    'writer',
+    'viewer-calendar',
+    'attendance',
+    'administrator',
+    'guide',
+  ].includes(activePortal)
 
   function renderPortalControls(className = 'embedded-toolbar') {
     return (

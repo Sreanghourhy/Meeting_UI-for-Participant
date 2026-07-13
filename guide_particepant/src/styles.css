@@ -49,21 +49,23 @@ button {
 }
 
 .guide-page {
-  width: min(1220px, 100%);
-  margin: 0 auto;
-  padding: 36px 24px 56px;
+  width: 100%;
+  min-height: calc(100vh - 65px);
+  margin: 0;
+  padding: 24px 28px 32px;
 }
 
 .guide-shell {
   width: 100%;
-  min-height: auto;
+  min-height: calc(100vh - 121px);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
 }
 
 .guide-detail-shell {
-  width: min(920px, 100%);
+  width: min(1040px, 100%);
+  min-height: calc(100vh - 121px);
   margin: 0 auto;
 }
 
@@ -129,6 +131,11 @@ h1 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
+}
+
+.guide-page .room-section,
+.guide-page .door-section {
+  align-items: start;
 }
 
 .room-selection-section {
@@ -277,6 +284,7 @@ h1 {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: #dfe8ee;
+  height: auto;
   aspect-ratio: 16 / 8.9;
   cursor: grab;
   touch-action: pan-y;
@@ -379,13 +387,15 @@ h1 {
 
 .door-shell {
   width: 100%;
-  min-height: auto;
-  display: block;
+  min-height: calc(100vh - 121px);
+  display: flex;
+  flex-direction: column;
 }
 
 .door-section {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: start;
   gap: 22px;
   margin-bottom: 14px;
 }
@@ -442,7 +452,8 @@ h1 {
 
 @media (max-width: 640px) {
   .guide-page {
-    padding: 24px 16px 40px;
+    min-height: calc(100vh - 65px);
+    padding: 18px 16px 28px;
   }
 
   .guide-shell {
